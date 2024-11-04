@@ -13,4 +13,7 @@ public interface UserRepository extends JpaRepository<User, String> {
  // List<User> findByFirstNameContaining(String keyword);
 
   //You can add custom queries here
+  @Query("SELECT MAX(u.userId) FROM User u")
+  Optional<String> findMaxUserId();
+
 }

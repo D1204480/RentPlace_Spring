@@ -12,7 +12,7 @@ import java.util.Date;
 public class User {
 
   @Id
-//  @GeneratedValue(strategy = GenerationType.IDENTITY)
+//  @GeneratedValue(strategy = GenerationType.IDENTITY)  資料庫自動生成id
   @Column(name = "user_id", nullable = false, length = 50)
   private String userId;
 

@@ -15,6 +15,19 @@ public class UserService {
   @Autowired
   private UserRepository userRepository;
 
+  @Autowired
+  private UserIdGenerator userIdGenerator;
+
+  @Transactional
+  public User createUser(User user) {
+    // 使用 UserIdGenerator 生成 ID
+    String newUserId = userIdGenerator.generateNewUserId();
+    user.setUserId(newUserId);
+
+    // 保存用戶
+    return userRepository.save(user);
+  }
+
   public List<User> getAllUsers() {
     List<User> users = userRepository.findAll();
     System.out.println("Fetched Users: " + users);
@@ -26,9 +39,9 @@ public class UserService {
     return userRepository.findById(userId);
   }
 
-  public User createUser(User user) {
-    return userRepository.save(user);
-  }
+//  public User createUser(User user) {
+//    return userRepository.save(user);
+//  }
 
   public User updateUser(String userId, User userDetails) {
     return userRepository.findById(userId)
