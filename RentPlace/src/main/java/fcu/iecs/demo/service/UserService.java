@@ -4,6 +4,7 @@ import fcu.iecs.demo.model.User;
 import fcu.iecs.demo.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -14,14 +15,14 @@ public class UserService {
   @Autowired
   private UserRepository userRepository;
 
-    public List<User> getAllUsers() {
-        List<User> users = userRepository.findAll();
-        System.out.println("Fetched Users: " + users);
-        return users;
-    }
+  public List<User> getAllUsers() {
+    List<User> users = userRepository.findAll();
+    System.out.println("Fetched Users: " + users);
+    return users;
+  }
 
 
-    public Optional<User> getUserById(String userId) {
+  public Optional<User> getUserById(String userId) {
     return userRepository.findById(userId);
   }
 
@@ -31,15 +32,15 @@ public class UserService {
 
   public User updateUser(String userId, User userDetails) {
     return userRepository.findById(userId)
-            .map(user -> {
-              user.setUsername(userDetails.getUsername());
-              user.setPassword(userDetails.getPassword());
-              user.setEmail(userDetails.getEmail());
-              user.setPhone(userDetails.getPhone());
-              user.setGender(userDetails.getGender());
-              user.setBirth(userDetails.getBirth());
-              return userRepository.save(user);
-            }).orElseThrow(() -> new RuntimeException("User not found"));
+        .map(user -> {
+          user.setUsername(userDetails.getUsername());
+          user.setPassword(userDetails.getPassword());
+          user.setEmail(userDetails.getEmail());
+          user.setPhone(userDetails.getPhone());
+          user.setGender(userDetails.getGender());
+          user.setBirth(userDetails.getBirth());
+          return userRepository.save(user);
+        }).orElseThrow(() -> new RuntimeException("User not found"));
   }
 
   public void deleteUser(String userId) {

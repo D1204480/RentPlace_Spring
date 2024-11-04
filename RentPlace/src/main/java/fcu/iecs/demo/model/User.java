@@ -2,13 +2,17 @@ package fcu.iecs.demo.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import org.hibernate.annotations.GeneratedColumn;
+
 import java.util.Date;
 
 @Data
 @Entity
 @Table(name = "Users_Table")
 public class User {
+
   @Id
+//  @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "user_id", nullable = false, length = 50)
   private String userId;
 
@@ -30,4 +34,5 @@ public class User {
   @Column(name = "birth")
   @Temporal(TemporalType.DATE)
   private Date birth;
+
 }
