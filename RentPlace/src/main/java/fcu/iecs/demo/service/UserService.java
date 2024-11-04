@@ -42,7 +42,7 @@ public class UserService {
 //  public User createUser(User user) {
 //    return userRepository.save(user);
 //  }
-  
+
   public User updateUser(String userId, User userDetails) {
     return userRepository.findById(userId)
         .map(user -> {
