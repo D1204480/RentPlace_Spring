@@ -12,7 +12,7 @@ import java.util.Date;
 public class User {
 
   @Id
-//  @GeneratedValue(strategy = GenerationType.IDENTITY)  資料庫自動生成id
+  //@GeneratedValue(strategy = GenerationType.IDENTITY)  資料庫自動生成id
   @Column(name = "user_id", nullable = false, length = 50)
   private String userId;
 
@@ -24,6 +24,8 @@ public class User {
 
   @Column(name = "email", nullable = false, length = 255)
   private String email;
+
+  private boolean enabled = false;
 
   @Column(name = "phone", nullable = false, length = 100)
   private String phone;
