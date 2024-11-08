@@ -1022,3 +1022,5 @@ jakarta.mail.AuthenticationFailedException: 534-5.7.9 Application-specific passw
 2024-11-08T14:07:45.183+08:00  INFO 5894 --- [demo] [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
 2024-11-08T14:07:45.184+08:00  INFO 5894 --- [demo] [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
 2024-11-08T14:07:48.983+08:00  INFO 5894 --- [demo] [http-nio-8080-exec-1] fcu.iecs.demo.service.EmailService       : Verification code email sent to yayammomo.h@gmail.com
+2024-11-08T14:53:22.600+08:00  INFO 5894 --- [demo] [http-nio-8080-exec-1] fcu.iecs.demo.service.EmailService       : Verification code email sent to 22@gmail.com
+2024-11-08T14:53:52.220+08:00  INFO 5894 --- [demo] [http-nio-8080-exec-2] fcu.iecs.demo.service.EmailService       : Verification code email sent to 22@gmail.com
