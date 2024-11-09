@@ -14,6 +14,9 @@ public interface UserRepository extends JpaRepository<User, String> {
 
   //You can add custom queries here
   @Query("SELECT MAX(u.userId) FROM User u")
-  Optional<String> findMaxUserId();
+  String findMaxUserId();
+
+  Optional<User> findByEmail(String email);
+  Boolean existsByEmail(String email);
 
 }

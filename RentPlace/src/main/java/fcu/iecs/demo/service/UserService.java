@@ -2,6 +2,7 @@ package fcu.iecs.demo.service;
 
 import fcu.iecs.demo.model.User;
 import fcu.iecs.demo.repository.UserRepository;
+import fcu.iecs.demo.util.UserIdGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

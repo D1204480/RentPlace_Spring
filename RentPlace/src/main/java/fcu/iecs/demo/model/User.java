@@ -19,13 +19,13 @@ public class User {
   @Column(name = "username", nullable = false, length = 255)
   private String username;
 
-  @Column(name = "password", nullable = false, length = 255)
+  @Column(name = "password", nullable = true, length = 255)   // 允許為空
   private String password;
 
   @Column(name = "email", nullable = false, length = 255)
   private String email;
 
-  @Column(name = "phone", nullable = false, length = 100)
+  @Column(name = "phone", nullable = true, length = 100)   // 允許為空
   private String phone;
 
   @Column(name = "gender", length = 50)
@@ -34,5 +34,8 @@ public class User {
   @Column(name = "birth")
   @Temporal(TemporalType.DATE)
   private Date birth;
+
+  @Column(name = "provider", nullable = false, length = 100)
+  private String provider;  // GOOGLE, FACEBOOK 等
 
 }
