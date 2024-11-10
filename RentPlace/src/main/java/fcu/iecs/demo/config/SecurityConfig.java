@@ -4,6 +4,7 @@ package fcu.iecs.demo.config;
 import fcu.iecs.demo.security.CustomUserDetailsService;
 import fcu.iecs.demo.security.JwtAuthenticationFilter;
 import fcu.iecs.demo.security.JwtTokenProvider;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -44,6 +45,12 @@ public class SecurityConfig {
     http
         .cors(cors -> cors.configurationSource(corsConfigurationSource()))
         .csrf(csrf -> csrf.disable())
+        .exceptionHandling(exception -> exception
+            .authenticationEntryPoint((request, response, authException) -> {
+              response.setContentType("application/json;charset=UTF-8");
+              response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+              response.getWriter().write("{\"message\":\"" + authException.getMessage() + "\"}");
+            }))
         .authorizeHttpRequests(authorize -> authorize
             .requestMatchers(
                 "/auth/**",

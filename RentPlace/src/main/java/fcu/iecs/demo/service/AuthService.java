@@ -10,38 +10,48 @@ import fcu.iecs.demo.model.User;
 import fcu.iecs.demo.repository.UserRepository;
 import fcu.iecs.demo.security.JwtTokenProvider;
 import fcu.iecs.demo.util.UserIdGenerator;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Service
-@Transactional
 public class AuthService {
   private static final Logger logger = LoggerFactory.getLogger(AuthService.class);
+  private final AuthenticationManager authenticationManager;
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
+  private final JwtTokenProvider jwtTokenProvider;
   private final UserIdGenerator userIdGenerator;
 
-//  @Autowired
-//  private UserRepository userRepository;
 
-  @Autowired
-  private JwtTokenProvider jwtTokenProvider;
-
-//  @Autowired
-//  private UserIdGenerator userIdGenerator;  // 注入 UserIdGenerator
-
-  public AuthService(UserRepository userRepository,
-                     PasswordEncoder passwordEncoder,
-                     UserIdGenerator userIdGenerator) {
+  public AuthService(
+      AuthenticationManager authenticationManager,
+      UserRepository userRepository,
+      PasswordEncoder passwordEncoder,
+      JwtTokenProvider jwtTokenProvider,
+      UserIdGenerator userIdGenerator) {
+    this.authenticationManager = authenticationManager;
     this.userRepository = userRepository;
     this.passwordEncoder = passwordEncoder;
+    this.jwtTokenProvider = jwtTokenProvider;
     this.userIdGenerator = userIdGenerator;
   }
 
@@ -77,6 +87,22 @@ public class AuthService {
     }
   }
 
+  public Authentication authenticate(String username, String password) {
+    try {
+      Authentication authentication = authenticationManager.authenticate(
+          new UsernamePasswordAuthenticationToken(username, password)
+      );
+
+      SecurityContextHolder.getContext().setAuthentication(authentication);
+      return authentication;
+
+    } catch (BadCredentialsException e) {
+      throw new BadCredentialsException("帳號或密碼錯誤");
+    } catch (Exception e) {
+      throw new RuntimeException("認證過程發生錯誤", e);
+    }
+  }
+
 
 //  public User registerUser(RegisterRequest registerRequest) {
 //    // 檢查用戶名是否已存在
@@ -103,25 +129,115 @@ public class AuthService {
 //    return userRepository.save(user);
 //  }
 
+//  public JwtAuthenticationResponse login(LoginRequest loginRequest) {
+//    try {
+//      // 使用 AuthenticationManager 進行認證
+//      Authentication authentication = authenticationManager.authenticate(
+//          new UsernamePasswordAuthenticationToken(
+//              loginRequest.getUsername(),
+//              loginRequest.getPassword()
+//          )
+//      );
+//
+//      // 設置 SecurityContext
+//      SecurityContextHolder.getContext().setAuthentication(authentication);
+//
+//      // 獲取用戶信息
+//      User user = userRepository.findByUsername(loginRequest.getUsername())
+//          .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+//
+//      // 獲取用戶權限
+//      List<String> roles = authentication.getAuthorities().stream()
+//          .map(GrantedAuthority::getAuthority)
+//          .collect(Collectors.toList());
+//
+//      // 生成 Token
+//      String jwt = jwtTokenProvider.generateToken(user);
+//
+//      return new JwtAuthenticationResponse(jwt);
+//
+//    } catch (BadCredentialsException e) {
+//      log.error("Invalid username or password for user: {}", loginRequest.getUsername());
+//      throw new BadCredentialsException("帳號或密碼錯誤");
+//    } catch (UsernameNotFoundException e) {
+//      log.error("User not found: {}", loginRequest.getUsername());
+//      throw new UsernameNotFoundException("用戶不存在");
+//    } catch (Exception e) {
+//      log.error("Login error for user: {}", loginRequest.getUsername(), e);
+//      throw new RuntimeException("登入過程發生錯誤");
+//    }
+//  }
+
   public JwtAuthenticationResponse login(LoginRequest loginRequest) {
-    // 驗證用戶
-    User user = userRepository.findByUsername(loginRequest.getUsername())
-        .orElseThrow(() -> new RuntimeException("User not found"));
+    logger.info("Attempting login for email: {}", loginRequest.getEmail());
 
-    // 檢查密碼
-    if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
-      throw new RuntimeException("Invalid password");
+    try {
+      // 1. 使用 email 查找用戶
+      User user = userRepository.findByEmail(loginRequest.getEmail())
+          .orElseThrow(() -> new UsernameNotFoundException("此 Email 尚未註冊"));
+
+      logger.debug("Found user with email: {}", user.getEmail());
+
+      // 2. 檢查密碼
+      if (user.getPassword() == null) {
+        throw new BadCredentialsException("此帳號使用第三方登入，請使用相應的登入方式");
+      }
+
+      if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
+        throw new BadCredentialsException("Email 或密碼錯誤");
+      }
+
+      // 3. 生成 JWT
+      String jwt = jwtTokenProvider.generateToken(user);
+
+      logger.info("Login successful for email: {}", loginRequest.getEmail());
+
+      // 4. 返回響應
+      return new JwtAuthenticationResponse(
+          jwt,
+          "Bearer",
+          user.getUsername(),
+          user.getEmail()
+      );
+
+    } catch (UsernameNotFoundException e) {
+      logger.error("User not found with email: {}", loginRequest.getEmail());
+      throw new UsernameNotFoundException("此 Email 尚未註冊");
+    } catch (BadCredentialsException e) {
+      logger.error("Invalid password for email: {}", loginRequest.getEmail());
+      throw new BadCredentialsException("Email 或密碼錯誤");
+    } catch (Exception e) {
+      logger.error("Login error for email: {}", loginRequest.getEmail(), e);
+      throw new RuntimeException("登入過程發生錯誤");
     }
-
-    // 生成 Token
-    String jwt = generateToken(user);
-
-    return new JwtAuthenticationResponse(jwt);
   }
 
-  private String generateToken(User user) {
-    // 這裡需要實現 JWT token 生成邏輯
-    // 可以使用之前創建的 JwtTokenProvider
-    return "generated-token";  // 臨時返回值，需要替換為實際的 token
+
+//  private String generateToken(User user) {
+//    // 這裡需要實現 JWT token 生成邏輯
+//    // 可以使用之前創建的 JwtTokenProvider
+//    return "generated-token";  // 臨時返回值，需要替換為實際的 token
+//  }
+
+  public JwtAuthenticationResponse generateToken(User user) {
+    try {
+      // 設置默認權限
+      List<GrantedAuthority> authorities = Collections.singletonList(
+          new SimpleGrantedAuthority("ROLE_USER")
+      );
+
+      // 生成 Token
+      String jwt = jwtTokenProvider.generateToken(user);
+
+      return new JwtAuthenticationResponse(
+          jwt,
+          "Bearer",
+          user.getUsername(),
+          user.getEmail());
+
+    } catch (Exception e) {
+      logger.error("Error generating token for user: {}", user.getUsername(), e);
+      throw new RuntimeException("Token 生成失敗");
+    }
   }
 }
