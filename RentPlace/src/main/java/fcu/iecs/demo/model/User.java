@@ -1,7 +1,9 @@
 package fcu.iecs.demo.model;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GeneratedColumn;
 
 import java.util.Date;
@@ -9,6 +11,8 @@ import java.util.Date;
 @Data
 @Entity
 @Table(name = "Users_Table")
+@AllArgsConstructor
+@NoArgsConstructor
 public class User {
 
   @Id
@@ -22,7 +26,7 @@ public class User {
   @Column(name = "password", nullable = true, length = 255)   // 允許為空
   private String password;
 
-  @Column(name = "email", nullable = false, length = 255)
+  @Column(name = "email", nullable = false, length = 255, unique = true)
   private String email;
 
   @Column(name = "phone", nullable = true, length = 100)   // 允許為空

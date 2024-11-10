@@ -4,26 +4,51 @@ import fcu.iecs.demo.model.User;
 import fcu.iecs.demo.repository.UserRepository;
 import fcu.iecs.demo.util.UserIdGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @Service
+@Transactional
 public class UserService {
 
-  @Autowired
-  private UserRepository userRepository;
+//  @Autowired
+//  private UserRepository userRepository;
 
   @Autowired
   private UserIdGenerator userIdGenerator;
 
-  @Autowired
-  private PasswordEncoder passwordEncoder;  // 注入 PasswordEncoder
+//  @Autowired
+//  private PasswordEncoder passwordEncoder;  // 注入 PasswordEncoder
 
-  @Transactional
+  private final UserRepository userRepository;
+  private final PasswordEncoder passwordEncoder;
+
+  // 使用構造函數注入
+  public UserService(UserRepository userRepository,
+                     @Lazy PasswordEncoder passwordEncoder) {
+    this.userRepository = userRepository;
+    this.passwordEncoder = passwordEncoder;
+  }
+
+  public UserDetails loadUserByUserId(String userId) {
+    User user = getUserById(userId)
+        .orElseThrow(() -> new UsernameNotFoundException("User not found with id: " + userId));
+
+    return new org.springframework.security.core.userdetails.User(
+        user.getUsername(),
+        user.getPassword(),
+        new ArrayList<>()
+    );
+  }
+
   public User createUser(User user) {
     // 使用 UserIdGenerator 生成 ID
     String newUserId = userIdGenerator.generateNewUserId();
@@ -46,6 +71,10 @@ public class UserService {
 
   public Optional<User> getUserById(String userId) {
     return userRepository.findById(userId);
+  }
+
+  public Optional<User> getUserByUsername(String username) {
+    return userRepository.findByUsername(username);
   }
 
 //  public User createUser(User user) {
