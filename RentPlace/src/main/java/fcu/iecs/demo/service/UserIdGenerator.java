@@ -1,15 +1,21 @@
-package fcu.iecs.demo.service;
-import fcu.iecs.demo.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.util.Optional;
-
+//package fcu.iecs.demo.service;
+//import fcu.iecs.demo.repository.UserRepository;
+//import org.springframework.beans.factory.annotation.Autowired;
+//import org.springframework.stereotype.Service;
+//import org.springframework.transaction.annotation.Transactional;
+//
+//import java.util.Optional;
+//
 //@Service
+//@Transactional(readOnly = true)  // 添加事務管理，只讀模式
 //public class UserIdGenerator {
 //
-//  @Autowired
-//  private UserRepository userRepository;
+//  private final UserRepository userRepository;
+//
+//  // 使用構造函數注入
+//  public UserIdGenerator(UserRepository userRepository) {
+//    this.userRepository = userRepository;
+//  }
 //
 //  public String generateNewUserId() {
 //    // 找到現有最大的 ID
@@ -26,4 +32,4 @@ import java.util.Optional;
 //    return String.format("U%04d", nextId);
 //  }
 //}
-
+//

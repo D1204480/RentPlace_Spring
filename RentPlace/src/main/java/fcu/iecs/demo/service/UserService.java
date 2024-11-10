@@ -19,21 +19,14 @@ import java.util.Optional;
 @Transactional
 public class UserService {
 
-//  @Autowired
-//  private UserRepository userRepository;
-
-  @Autowired
-  private UserIdGenerator userIdGenerator;
-
-//  @Autowired
-//  private PasswordEncoder passwordEncoder;  // 注入 PasswordEncoder
-
+  private final UserIdGenerator userIdGenerator;
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
 
-  // 使用構造函數注入
-  public UserService(UserRepository userRepository,
-                     @Lazy PasswordEncoder passwordEncoder) {
+  public UserService(UserIdGenerator userIdGenerator,
+                     UserRepository userRepository,
+                     PasswordEncoder passwordEncoder) {
+    this.userIdGenerator = userIdGenerator;
     this.userRepository = userRepository;
     this.passwordEncoder = passwordEncoder;
   }
@@ -50,7 +43,7 @@ public class UserService {
   }
 
   public User createUser(User user) {
-    // 使用 UserIdGenerator 生成 ID
+    // 在事務中生成 ID 和保存用戶
     String newUserId = userIdGenerator.generateNewUserId();
     user.setUserId(newUserId);
 
@@ -58,8 +51,11 @@ public class UserService {
     String encodedPassword = passwordEncoder.encode(user.getPassword());
     user.setPassword(encodedPassword);
 
-    // 保存用戶
-    return userRepository.save(user);
+    try {
+      return userRepository.save(user);
+    } catch (Exception e) {
+      throw new RuntimeException("Failed to create user: " + e.getMessage(), e);
+    }
   }
 
   public List<User> getAllUsers() {
