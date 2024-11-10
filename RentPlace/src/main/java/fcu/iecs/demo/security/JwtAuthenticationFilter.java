@@ -16,70 +16,25 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
-import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
-//@Component
-//public class JwtAuthenticationFilter extends OncePerRequestFilter {
-//
-//  @Autowired
-//  private JwtTokenProvider tokenProvider;
-//
-//  @Autowired
-//  private CustomUserDetailsService customUserDetailsService;
-//
-//  @Autowired
-//  private UserDetailsService userDetailsService;
-//
-//  @Override
-//  protected void doFilterInternal(HttpServletRequest request,
-//                                  HttpServletResponse response,
-//                                  FilterChain filterChain) throws ServletException, IOException {
-//    try {
-//      String jwt = getJwtFromRequest(request);
-//
-//      if (StringUtils.hasText(jwt) && tokenProvider.validateToken(jwt)) {
-//        String userId = tokenProvider.getUserIdFromJWT(jwt);
-//
-//        UserDetails userDetails = customUserDetailsService.loadUserById(userId);  // 直接使用 String
-//        UsernamePasswordAuthenticationToken authentication =
-//            new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-//        authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-//
-//        SecurityContextHolder.getContext().setAuthentication(authentication);
-//      }
-//    } catch (Exception ex) {
-//      logger.error("Could not set user authentication in security context", ex);
-//    }
-//
-//    filterChain.doFilter(request, response);
-//  }
-//
-//  private String getJwtFromRequest(HttpServletRequest request) {
-//    String bearerToken = request.getHeader("Authorization");
-//    if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
-//      return bearerToken.substring(7);
-//    }
-//    return null;
-//  }
-//}
 
-@Component
-@Slf4j
+
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
   private final JwtTokenProvider tokenProvider;
+  private final CustomUserDetailsService customUserDetailsService;
 
-  @Lazy
   @Autowired
-  private UserService userService;
+  private UserDetailsService userDetailsService;
 
-  public JwtAuthenticationFilter(JwtTokenProvider tokenProvider) {
+  public JwtAuthenticationFilter(JwtTokenProvider tokenProvider,
+                                 CustomUserDetailsService customUserDetailsService) {
     this.tokenProvider = tokenProvider;
+    this.customUserDetailsService = customUserDetailsService;
   }
 
   @Override
@@ -92,7 +47,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
       if (StringUtils.hasText(jwt) && tokenProvider.validateToken(jwt)) {
         String userId = tokenProvider.getUserIdFromJWT(jwt);
 
-        UserDetails userDetails = userService.loadUserByUserId(userId);
+        UserDetails userDetails = customUserDetailsService.loadUserById(userId);  // 直接使用 String
         UsernamePasswordAuthenticationToken authentication =
             new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
         authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
@@ -100,7 +55,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         SecurityContextHolder.getContext().setAuthentication(authentication);
       }
     } catch (Exception ex) {
-      log.error("Could not set user authentication in security context", ex);
+      logger.error("Could not set user authentication in security context", ex);
     }
 
     filterChain.doFilter(request, response);
@@ -114,3 +69,50 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     return null;
   }
 }
+
+//@Component
+//@Slf4j
+//public class JwtAuthenticationFilter extends OncePerRequestFilter {
+//
+//  private final JwtTokenProvider tokenProvider;
+//
+//  @Lazy
+//  @Autowired
+//  private UserService userService;
+//
+//  public JwtAuthenticationFilter(JwtTokenProvider tokenProvider) {
+//    this.tokenProvider = tokenProvider;
+//  }
+//
+//  @Override
+//  protected void doFilterInternal(HttpServletRequest request,
+//                                  HttpServletResponse response,
+//                                  FilterChain filterChain) throws ServletException, IOException {
+//    try {
+//      String jwt = getJwtFromRequest(request);
+//
+//      if (StringUtils.hasText(jwt) && tokenProvider.validateToken(jwt)) {
+//        String userId = tokenProvider.getUserIdFromJWT(jwt);
+//
+//        UserDetails userDetails = userService.loadUserByUserId(userId);
+//        UsernamePasswordAuthenticationToken authentication =
+//            new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+//        authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+//
+//        SecurityContextHolder.getContext().setAuthentication(authentication);
+//      }
+//    } catch (Exception ex) {
+//      log.error("Could not set user authentication in security context", ex);
+//    }
+//
+//    filterChain.doFilter(request, response);
+//  }
+//
+//  private String getJwtFromRequest(HttpServletRequest request) {
+//    String bearerToken = request.getHeader("Authorization");
+//    if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
+//      return bearerToken.substring(7);
+//    }
+//    return null;
+//  }
+//}

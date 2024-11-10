@@ -78,30 +78,30 @@ public class AuthService {
   }
 
 
-  public User registerUser(RegisterRequest registerRequest) {
-    // 檢查用戶名是否已存在
-    if (userRepository.existsByUsername(registerRequest.getUsername())) {
-      throw new RuntimeException("Username is already taken!");
-    }
-
-    // 檢查電子郵件是否已存在
-    if (userRepository.existsByEmail(registerRequest.getEmail())) {
-      throw new RuntimeException("Email is already in use!");
-    }
-
-    // 創建新用戶
-    User user = new User();
-    user.setUserId(userIdGenerator.generateNewUserId());  // 生成用戶ID
-    user.setUsername(registerRequest.getUsername());
-    user.setEmail(registerRequest.getEmail());
-    user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
-    // 設置其他必要的字段
-//    user.setCreatedAt(new Date());
-//    user.setActive(true);
-
-    // 保存用戶
-    return userRepository.save(user);
-  }
+//  public User registerUser(RegisterRequest registerRequest) {
+//    // 檢查用戶名是否已存在
+//    if (userRepository.existsByUsername(registerRequest.getUsername())) {
+//      throw new RuntimeException("Username is already taken!");
+//    }
+//
+//    // 檢查電子郵件是否已存在
+//    if (userRepository.existsByEmail(registerRequest.getEmail())) {
+//      throw new RuntimeException("Email is already in use!");
+//    }
+//
+//    // 創建新用戶
+//    User user = new User();
+//    user.setUserId(userIdGenerator.generateNewUserId());  // 生成用戶ID
+//    user.setUsername(registerRequest.getUsername());
+//    user.setEmail(registerRequest.getEmail());
+//    user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
+//    // 設置其他必要的字段
+////    user.setCreatedAt(new Date());
+////    user.setActive(true);
+//
+//    // 保存用戶
+//    return userRepository.save(user);
+//  }
 
   public JwtAuthenticationResponse login(LoginRequest loginRequest) {
     // 驗證用戶
