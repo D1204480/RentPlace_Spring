@@ -3,6 +3,7 @@ package fcu.iecs.demo.service;
 import fcu.iecs.demo.model.User;
 import fcu.iecs.demo.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,11 +19,18 @@ public class UserService {
   @Autowired
   private UserIdGenerator userIdGenerator;
 
+  @Autowired
+  private PasswordEncoder passwordEncoder;  // 注入 PasswordEncoder
+
   @Transactional
   public User createUser(User user) {
     // 使用 UserIdGenerator 生成 ID
     String newUserId = userIdGenerator.generateNewUserId();
     user.setUserId(newUserId);
+
+    // 加密密碼
+    String encodedPassword = passwordEncoder.encode(user.getPassword());
+    user.setPassword(encodedPassword);
 
     // 保存用戶
     return userRepository.save(user);
@@ -47,7 +55,10 @@ public class UserService {
     return userRepository.findById(userId)
         .map(user -> {
           user.setUsername(userDetails.getUsername());
-          user.setPassword(userDetails.getPassword());
+          // 如果更新密碼，也需要加密
+          if (userDetails.getPassword() != null && !userDetails.getPassword().isEmpty()) {
+            user.setPassword(passwordEncoder.encode(userDetails.getPassword()));
+          }
           user.setEmail(userDetails.getEmail());
           user.setPhone(userDetails.getPhone());
           user.setGender(userDetails.getGender());
