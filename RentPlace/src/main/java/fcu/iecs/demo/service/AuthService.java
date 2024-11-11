@@ -213,12 +213,6 @@ public class AuthService {
   }
 
 
-//  private String generateToken(User user) {
-//    // 這裡需要實現 JWT token 生成邏輯
-//    // 可以使用之前創建的 JwtTokenProvider
-//    return "generated-token";  // 臨時返回值，需要替換為實際的 token
-//  }
-
   public JwtAuthenticationResponse generateToken(User user) {
     try {
       // 設置默認權限
