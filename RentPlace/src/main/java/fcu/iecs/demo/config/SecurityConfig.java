@@ -27,7 +27,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.Arrays;
 
 @Configuration
-@EnableWebSecurity
+@EnableWebSecurity  // 啟用 Spring Security
 @EnableMethodSecurity
 public class SecurityConfig {
 
@@ -43,8 +43,8 @@ public class SecurityConfig {
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     http
-        .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-        .csrf(csrf -> csrf.disable())
+        .cors(cors -> cors.configurationSource(corsConfigurationSource()))   //允許跨域請求配置
+        .csrf(csrf -> csrf.disable())   //停用 CSRF 保護
         .exceptionHandling(exception -> exception
             .authenticationEntryPoint((request, response, authException) -> {
               response.setContentType("application/json;charset=UTF-8");
@@ -61,11 +61,11 @@ public class SecurityConfig {
                 "/api/register",
                 "/api/login",
                 "/api/public/**"
-            ).permitAll()
-            .anyRequest().authenticated()
+            ).permitAll()   // 這些路徑允許公開訪問
+            .anyRequest().authenticated()   // 其他所有請求需要認證
         )
         .sessionManagement(session -> session
-            .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            .sessionCreationPolicy(SessionCreationPolicy.STATELESS)   //設定為無狀態（STATELESS）
         )
         .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
@@ -75,8 +75,11 @@ public class SecurityConfig {
   @Bean
   public CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration configuration = new CorsConfiguration();
+    // 允許的來源（這裡是本地開發環境）
     configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173"));
+    // 允許的 HTTP 方法
     configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+    // 允許的 HTTP 標頭
     configuration.setAllowedHeaders(Arrays.asList(
         "Authorization",
         "Content-Type",
@@ -86,8 +89,8 @@ public class SecurityConfig {
         "Cache-Control",
         "verify-code"
     ));
-    configuration.setAllowCredentials(true);
-    configuration.setMaxAge(3600L);
+    configuration.setAllowCredentials(true);   // 允許攜帶認證訊息
+    configuration.setMaxAge(3600L);   // 預檢請求的有效期
 
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
     source.registerCorsConfiguration("/**", configuration);
@@ -100,17 +103,20 @@ public class SecurityConfig {
   }
 
   @Bean
+  // 密碼加密器
   public PasswordEncoder passwordEncoder() {
     return new BCryptPasswordEncoder();
   }
 
   @Bean
+  // 認證管理器配置
   public AuthenticationManager authenticationManager(
       AuthenticationConfiguration authenticationConfiguration) throws Exception {
     return authenticationConfiguration.getAuthenticationManager();
   }
 
   @Bean
+  // 忽略 Swagger 文檔相關路徑的安全檢查
   public WebSecurityCustomizer webSecurityCustomizer() {
     return (web) -> web.ignoring()
         .requestMatchers(
