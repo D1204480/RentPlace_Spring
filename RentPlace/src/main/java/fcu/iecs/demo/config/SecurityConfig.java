@@ -58,12 +58,12 @@ public class SecurityConfig {
                 "/api/send-verification-code",
                 "/api/verify-code",
                 "/api/auth/**",
-                "/api/register",
+                "/api/user",
                 "/api/login",
                 "/api/public/**",
                 "/api/venues/**",
-                    "/api/images/**",
-                    "/api/equipment/**"
+                "/api/images/**",
+                "/api/equipment/**"
             ).permitAll()
             .anyRequest().authenticated()
         )

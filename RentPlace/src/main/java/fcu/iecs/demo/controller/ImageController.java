@@ -10,6 +10,7 @@ import java.io.IOException;
 import fcu.iecs.demo.model.Image;
 import fcu.iecs.demo.service.ImageService;
 @RestController
+@CrossOrigin("http://localhost:5173")
 @RequestMapping("/api/images")  // 更新 URL 路徑為 images
 public class ImageController {
 
