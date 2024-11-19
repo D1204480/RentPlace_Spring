@@ -61,7 +61,9 @@ public class SecurityConfig {
                 "/api/register",
                 "/api/login",
                 "/api/public/**",
-                "/api/venues/**"
+                "/api/venues/**",
+                    "/api/images/**",
+                    "/api/equipment/**"
             ).permitAll()
             .anyRequest().authenticated()
         )
