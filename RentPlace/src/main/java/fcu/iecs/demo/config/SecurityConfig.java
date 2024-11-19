@@ -60,9 +60,10 @@ public class SecurityConfig {
                 "/api/auth/**",
                 "/api/register",
                 "/api/login",
-                "/api/public/**"
-            ).permitAll()   // 這些路徑允許公開訪問
-            .anyRequest().authenticated()   // 其他所有請求需要認證
+                "/api/public/**",
+                "/api/venues/**"
+            ).permitAll()
+            .anyRequest().authenticated()
         )
         .sessionManagement(session -> session
             .sessionCreationPolicy(SessionCreationPolicy.STATELESS)   //設定為無狀態（STATELESS）
