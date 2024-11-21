@@ -1,47 +1,42 @@
 package fcu.iecs.demo.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
 import fcu.iecs.demo.model.Image;
 import fcu.iecs.demo.service.ImageService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Optional;
+
 @RestController
-@RequestMapping("/api/images")  // 更新 URL 路徑為 images
+@RequestMapping("/api/images")
 public class ImageController {
 
     @Autowired
     private ImageService imageService;
 
-    // 上傳圖片
-    @PostMapping("/upload")
-    public ResponseEntity<Image> uploadImage(@RequestParam("file") MultipartFile file) {
-        try {
-            Image savedImage = imageService.saveImage(file);
-            return new ResponseEntity<>(savedImage, HttpStatus.CREATED);
-        } catch (IOException e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    @GetMapping
+    public ResponseEntity<List<Image>> getAllImages() {
+        List<Image> images = imageService.getAllImages();
+        return ResponseEntity.ok(images);
     }
 
-    // 取得圖片
-    @GetMapping("/{imageId}")
-    public ResponseEntity<Image> getImage(@PathVariable Long imageId) {
-        Image image = imageService.getImage(imageId);
-        return image != null ? new ResponseEntity<>(image, HttpStatus.OK) : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    @GetMapping("/{id}")
+    public ResponseEntity<Image> getImageById(@PathVariable Integer id) {
+        Optional<Image> image = imageService.getImageById(id);
+        return image.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
 
-    // 刪除圖片
-    @DeleteMapping("/{imageId}")
-    public ResponseEntity<Void> deleteImage(@PathVariable Long imageId) {
-        try {
-            imageService.deleteImage(imageId);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } catch (IOException e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    @PostMapping
+    public ResponseEntity<Image> addImage(@RequestBody Image image) {
+        Image savedImage = imageService.addImage(image);
+        return ResponseEntity.ok(savedImage);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteImage(@PathVariable Integer id) {
+        imageService.deleteImage(id);
+        return ResponseEntity.noContent().build();
     }
 }
