@@ -40,6 +40,7 @@ public class VenueService {
             venue.setAvailableTime(venueDetails.getAvailableTime());
             venue.setRemark(venueDetails.getRemark());
             venue.setImageId(venueDetails.getImageId());
+            venue.setPhoneNumber(venueDetails.getPhoneNumber());
             return venueRepository.save(venue);
         }).orElseThrow(() -> new RuntimeException("Venue not found with id " + id));
     }

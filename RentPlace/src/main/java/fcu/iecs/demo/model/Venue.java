@@ -45,4 +45,7 @@ public class Venue {
 
     @Column(name = "image_id")
     private Integer imageId;
+
+    @Column(name = "phone_number")
+    private String phoneNumber;
 }
