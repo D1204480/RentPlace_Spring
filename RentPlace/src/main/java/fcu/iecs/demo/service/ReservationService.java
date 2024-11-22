@@ -17,7 +17,7 @@ public class ReservationService {
     private ReservationRepository reservationRepository;
 
     public List<Reservation> getAllReservations() {
-        return reservationRepository.findAll();
+        return reservationRepository.findAllWithStatus();
     }
 
     public Optional<Reservation> getReservationById(Integer reservationId) {

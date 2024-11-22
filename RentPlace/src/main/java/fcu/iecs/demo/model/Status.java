@@ -6,7 +6,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "status_table")
+@Table(name = "Status")
 public class Status {
     @Id
     @Column(name = "status_id")
@@ -16,7 +16,6 @@ public class Status {
     private String status;
 
     // getters and setters
-
     public Integer getStatusId() {
         return statusId;
     }

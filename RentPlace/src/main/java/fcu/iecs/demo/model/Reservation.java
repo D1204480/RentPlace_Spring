@@ -36,9 +36,9 @@ public class Reservation {
     @Column(name = "status_id")
     private Integer statusId;
 
-    // 新增與 Status 的關聯
+    // 與 Status 的關聯
     @ManyToOne(fetch = FetchType.EAGER)  // 確保在查詢 Reservation 時會自動載入關聯的 Status 資訊
-    @JoinColumn(name = "status", insertable = false, updatable = false)   //false 確保不會透過關聯物件更改到資料庫
+    @JoinColumn(name = "status_id", insertable=false, updatable=false)   // 明確指定關聯欄位
     private Status statusInfo;
 
     // Getters and Setters
