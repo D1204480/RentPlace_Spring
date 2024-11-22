@@ -38,7 +38,7 @@ public class Reservation {
 
     // 與 Status 的關聯表
     @ManyToOne(fetch = FetchType.EAGER)  // 確保在查詢 Reservation 時會自動載入關聯的 Status 資訊
-    @JoinColumn(name = "status_id", insertable=false, updatable=false)   // 明確指定關聯欄位
+    @JoinColumn(name = "status_id", referencedColumnName = "status_id", insertable=false, updatable=false)   // 明確指定關聯欄位
     private Status statusInfo;
 
     // Getters and Setters
