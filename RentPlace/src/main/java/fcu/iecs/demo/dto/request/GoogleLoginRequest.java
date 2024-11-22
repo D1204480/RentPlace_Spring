@@ -7,7 +7,7 @@ public class GoogleLoginRequest {
   private String name;
   private String picture;
 
-  // 構造函數
+  // 建構函式
   public GoogleLoginRequest() {}
 
   // Getters and Setters

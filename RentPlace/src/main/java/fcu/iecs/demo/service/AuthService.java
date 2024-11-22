@@ -197,7 +197,8 @@ public class AuthService {
           jwt,
           "Bearer",
           user.getUsername(),
-          user.getEmail()
+          user.getEmail(),
+          user.getPhone()
       );
 
     } catch (UsernameNotFoundException e) {
@@ -227,7 +228,8 @@ public class AuthService {
           jwt,
           "Bearer",
           user.getUsername(),
-          user.getEmail());
+          user.getEmail(),
+          user.getPhone());
 
     } catch (Exception e) {
       logger.error("Error generating token for user: {}", user.getUsername(), e);

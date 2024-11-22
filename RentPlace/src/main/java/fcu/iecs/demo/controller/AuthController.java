@@ -47,15 +47,6 @@ public class AuthController {
     }
   }
 
-//  @PostMapping("/login")
-//  public ResponseEntity<?> login(@Valid @RequestBody LoginRequest loginRequest) {
-//    try {
-//      JwtAuthenticationResponse response = authService.login(loginRequest);
-//      return ResponseEntity.ok(response);
-//    } catch (Exception e) {
-//      return ResponseEntity.badRequest().body(new MessageResponse(e.getMessage()));
-//    }
-//  }
 
   @PostMapping("/login")
   public ResponseEntity<?> login(@Valid @RequestBody LoginRequest loginRequest) {
