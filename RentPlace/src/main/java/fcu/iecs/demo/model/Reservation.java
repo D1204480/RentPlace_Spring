@@ -16,7 +16,7 @@ public class Reservation {
     private Integer venueId;
 
     @Column(name = "user_id", nullable = false)
-    private Integer userId;
+    private String userId;
 
     @Column(name = "time_period_id", nullable = false)
     private Integer timePeriodId;
@@ -33,8 +33,13 @@ public class Reservation {
     @Column(name = "content")
     private String content;
 
-    @Column(name = "status")
-    private Integer status;
+    @Column(name = "status_id")
+    private Integer statusId;
+
+    // 新增與 Status 的關聯
+    @ManyToOne(fetch = FetchType.EAGER)  // 確保在查詢 Reservation 時會自動載入關聯的 Status 資訊
+    @JoinColumn(name = "status", insertable = false, updatable = false)   //false 確保不會透過關聯物件更改到資料庫
+    private Status statusInfo;
 
     // Getters and Setters
     public Integer getReservationId() {
@@ -53,11 +58,11 @@ public class Reservation {
         this.venueId = venueId;
     }
 
-    public Integer getUserId() {
+    public String getUserId() {
         return userId;
     }
 
-    public void setUserId(Integer userId) {
+    public void setUserId(String userId) {
         this.userId = userId;
     }
 
@@ -101,11 +106,20 @@ public class Reservation {
         this.content = content;
     }
 
-    public Integer getStatus() {
-        return status;
+    public Integer getStatusId() {
+        return statusId;
     }
-    public void setStatus(Integer status) {
-        this.status = status;
+
+    public void setStatusId(Integer statusId) {
+        this.statusId = statusId;
+    }
+
+    public Status getStatusInfo() {
+        return statusInfo;
+    }
+
+    public void setStatusInfo(Status statusInfo) {
+        this.statusInfo = statusInfo;
     }
 
 }
