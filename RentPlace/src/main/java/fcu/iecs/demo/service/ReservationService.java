@@ -17,18 +17,18 @@ public class ReservationService {
     private ReservationRepository reservationRepository;
 
     public List<Reservation> getAllReservations() {
-        return reservationRepository.findAllWithStatus();
+        return reservationRepository.findAllWithTimePeriodAndStatus();
     }
 
-    public Optional<Reservation> getReservationById(Integer reservationId) {
-        return reservationRepository.findById(reservationId);
+    public Optional<Reservation> getReservationById(Integer id) {
+        return reservationRepository.findByIdWithTimePeriodAndStatus(id);
     }
 
     public Reservation createReservation(Reservation reservation) {
         return reservationRepository.save(reservation);
     }
 
-    public void deleteReservation(Integer reservationId) {
-        reservationRepository.deleteById(reservationId);
+    public void deleteReservation(Integer id) {
+        reservationRepository.deleteById(id);
     }
 }

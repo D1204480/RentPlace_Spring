@@ -15,4 +15,10 @@ import java.util.Optional;
 public interface ReservationRepository extends JpaRepository<Reservation, Integer> {
     @Query("SELECT r FROM Reservation r JOIN FETCH r.statusInfo")
     List<Reservation> findAllWithStatus();
+
+    @Query("SELECT r FROM Reservation r JOIN FETCH r.timePeriod JOIN FETCH r.statusInfo")
+    List<Reservation> findAllWithTimePeriodAndStatus();
+
+    @Query("SELECT r FROM Reservation r JOIN FETCH r.timePeriod JOIN FETCH r.statusInfo WHERE r.id = :id")
+    Optional<Reservation> findByIdWithTimePeriodAndStatus(@Param("id") Integer id);
 }

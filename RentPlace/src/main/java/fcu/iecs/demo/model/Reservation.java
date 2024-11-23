@@ -36,6 +36,10 @@ public class Reservation {
     @Column(name = "status_id")
     private Integer statusId;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "time_period_id", referencedColumnName = "time_period_id", insertable = false, updatable = false)
+    private TimePeriod timePeriod;
+
     // 與 Status 的關聯表
     @ManyToOne(fetch = FetchType.EAGER)  // 確保在查詢 Reservation 時會自動載入關聯的 Status 資訊
     @JoinColumn(name = "status_id", referencedColumnName = "status_id", insertable=false, updatable=false)   // 明確指定關聯欄位
@@ -112,6 +116,14 @@ public class Reservation {
 
     public void setStatusId(Integer statusId) {
         this.statusId = statusId;
+    }
+
+    public TimePeriod getTimePeriod() {
+        return timePeriod;
+    }
+
+    public void setTimePeriod(TimePeriod timePeriod) {
+        this.timePeriod = timePeriod;
     }
 
     public Status getStatusInfo() {
