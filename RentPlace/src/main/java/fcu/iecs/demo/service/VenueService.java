@@ -35,7 +35,7 @@ public class VenueService {
             venue.setRegionName(venueDetails.getRegionName());
             venue.setAddress(venueDetails.getAddress());
             venue.setUnitPrice(venueDetails.getUnitPrice());
-            venue.setUnitType(venueDetails.getUnitType());
+//            venue.setUnitType(venueDetails.getUnitType());
             venue.setCapacity(venueDetails.getCapacity());
             venue.setAvailableTime(venueDetails.getAvailableTime());
             venue.setRemark(venueDetails.getRemark());

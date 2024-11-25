@@ -31,8 +31,8 @@ public class Venue {
     @Column(name = "unit_price", nullable = false)
     private Double unitPrice;
 
-    @Column(name = "unit_type", nullable = false)
-    private String unitType;
+//    @Column(name = "unit_type", nullable = false)
+//    private String unitType;
 
     @Column(name = "unit", nullable = false)
     private String unit;
