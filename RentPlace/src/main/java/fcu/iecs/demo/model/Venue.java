@@ -34,6 +34,9 @@ public class Venue {
     @Column(name = "unit_type", nullable = false)
     private String unitType;
 
+    @Column(name = "unit", nullable = false)
+    private String unit;
+
     @Column(name = "capacity", nullable = false)
     private Integer capacity;
 
@@ -45,4 +48,7 @@ public class Venue {
 
     @Column(name = "image_id")
     private Integer imageId;
+
+    @Column(name = "phone_number")
+    private String phoneNumber;
 }
