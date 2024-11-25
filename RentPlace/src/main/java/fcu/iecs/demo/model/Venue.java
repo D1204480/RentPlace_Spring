@@ -1,5 +1,6 @@
 package fcu.iecs.demo.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -55,5 +56,6 @@ public class Venue {
     private String phoneNumber;
 
     @OneToMany(mappedBy = "venue")
+    @JsonIgnoreProperties("venue")
     private List<Equipment> equipment;
 }
