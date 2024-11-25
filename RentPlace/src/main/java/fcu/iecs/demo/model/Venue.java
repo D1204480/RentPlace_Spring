@@ -3,6 +3,8 @@ package fcu.iecs.demo.model;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 @Entity
 @Table(name = "Venue")
@@ -51,4 +53,7 @@ public class Venue {
 
     @Column(name = "phone_number")
     private String phoneNumber;
+
+    @OneToMany(mappedBy = "venue")
+    private List<Equipment> equipment;
 }
