@@ -1,5 +1,6 @@
 package fcu.iecs.demo.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -17,6 +18,7 @@ public class Equipment {
     private String equipmentName;
 
     @ManyToOne
-    @JoinColumn(name = "venue_id", nullable = false)
+    @JoinColumn(name = "venue_id")
+    @JsonIgnoreProperties("equipment")
     private Venue venue;
 }

@@ -1,7 +1,10 @@
 package fcu.iecs.demo.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Data;
+
+import java.util.List;
 
 @Data
 @Entity
@@ -51,4 +54,8 @@ public class Venue {
 
     @Column(name = "phone_number")
     private String phoneNumber;
+
+    @OneToMany(mappedBy = "venue")
+    @JsonIgnoreProperties("venue")
+    private List<Equipment> equipment;
 }
