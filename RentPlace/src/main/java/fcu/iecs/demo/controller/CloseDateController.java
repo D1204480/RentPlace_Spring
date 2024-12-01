@@ -14,31 +14,37 @@ import java.util.Optional;
 @RequestMapping("/api/close-dates")
 public class CloseDateController {
 
-    @Autowired
-    private CloseDateService closeDateService;
+  @Autowired
+  private CloseDateService closeDateService;
 
-    @GetMapping
-    public ResponseEntity<List<CloseDate>> getAllCloseDates() {
-        List<CloseDate> closeDates = closeDateService.getAllCloseDates();
-        return ResponseEntity.ok(closeDates);
-    }
+  @GetMapping("/venue/{venueId}")
+  public ResponseEntity<List<CloseDate>> getCloseDatesByVenue(@PathVariable Integer venueId) {
+    List<CloseDate> closeDates = closeDateService.getCloseDatesByVenueId(venueId);
+    return ResponseEntity.ok(closeDates);
+  }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<CloseDate> getCloseDateById(@PathVariable Integer id) {
-        Optional<CloseDate> closeDate = closeDateService.getCloseDateById(id);
-        return closeDate.map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
-    }
+  @GetMapping
+  public ResponseEntity<List<CloseDate>> getAllCloseDates() {
+    List<CloseDate> closeDates = closeDateService.getAllCloseDates();
+    return ResponseEntity.ok(closeDates);
+  }
 
-    @PostMapping
-    public ResponseEntity<CloseDate> createCloseDate(@RequestBody CloseDate closeDate) {
-        CloseDate savedCloseDate = closeDateService.createCloseDate(closeDate);
-        return ResponseEntity.ok(savedCloseDate);
-    }
+  @GetMapping("/{id}")
+  public ResponseEntity<CloseDate> getCloseDateById(@PathVariable Integer id) {
+    Optional<CloseDate> closeDate = closeDateService.getCloseDateById(id);
+    return closeDate.map(ResponseEntity::ok)
+        .orElse(ResponseEntity.notFound().build());
+  }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCloseDate(@PathVariable Integer id) {
-        closeDateService.deleteCloseDate(id);
-        return ResponseEntity.noContent().build();
-    }
+  @PostMapping
+  public ResponseEntity<CloseDate> createCloseDate(@RequestBody CloseDate closeDate) {
+    CloseDate savedCloseDate = closeDateService.createCloseDate(closeDate);
+    return ResponseEntity.ok(savedCloseDate);
+  }
+
+  @DeleteMapping("/{id}")
+  public ResponseEntity<Void> deleteCloseDate(@PathVariable Integer id) {
+    closeDateService.deleteCloseDate(id);
+    return ResponseEntity.noContent().build();
+  }
 }

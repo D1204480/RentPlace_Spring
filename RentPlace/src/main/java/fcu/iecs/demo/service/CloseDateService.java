@@ -13,6 +13,10 @@ public class CloseDateService {
     @Autowired
     private CloseDateRepository closeDateRepository;
 
+    public List<CloseDate> getCloseDatesByVenueId(Integer venueId) {
+        return closeDateRepository.findByVenueIdWithVenueAndStatus(venueId);
+    }
+
     public List<CloseDate> getAllCloseDates() {
         return closeDateRepository.findAllWithVenueAndStatus();
     }
