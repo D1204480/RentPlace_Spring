@@ -1,7 +1,10 @@
 package fcu.iecs.demo.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Data;
+
+import java.util.List;
 
 @Data
 @Entity
@@ -31,8 +34,11 @@ public class Venue {
     @Column(name = "unit_price", nullable = false)
     private Double unitPrice;
 
-    @Column(name = "unit_type", nullable = false)
-    private String unitType;
+//    @Column(name = "unit_type", nullable = false)
+//    private String unitType;
+
+    @Column(name = "unit", nullable = false)
+    private String unit;
 
     @Column(name = "capacity", nullable = false)
     private Integer capacity;
@@ -45,4 +51,11 @@ public class Venue {
 
     @Column(name = "image_id")
     private Integer imageId;
+
+    @Column(name = "phone_number")
+    private String phoneNumber;
+
+    @OneToMany(mappedBy = "venue")
+    @JsonIgnoreProperties("venue")
+    private List<Equipment> equipment;
 }

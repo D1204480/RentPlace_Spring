@@ -31,4 +31,8 @@ public class EquipmentService {
     public void deleteEquipment(Integer id) {
         equipmentRepository.deleteById(id);
     }
+
+    public List<Equipment> getEquipmentByVenueId(Integer venueId) {
+        return equipmentRepository.findAllByVenueId(venueId);
+    }
 }

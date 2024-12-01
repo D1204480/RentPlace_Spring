@@ -13,22 +13,42 @@ import java.util.Optional;
 @Service
 public class ReservationService {
 
-    @Autowired
-    private ReservationRepository reservationRepository;
+  @Autowired
+  private ReservationRepository reservationRepository;
 
-    public List<Reservation> getAllReservations() {
-        return reservationRepository.findAllWithTimePeriodAndStatus();
-    }
+  public List<Reservation> getAllReservations() {
+    return reservationRepository.findAllWithTimePeriodAndStatus();
+  }
 
-    public Optional<Reservation> getReservationById(Integer id) {
-        return reservationRepository.findByIdWithTimePeriodAndStatus(id);
-    }
+  public Optional<Reservation> getReservationById(Integer id) {
+    return reservationRepository.findByIdWithTimePeriodAndStatus(id);
+  }
 
-    public Reservation createReservation(Reservation reservation) {
-        return reservationRepository.save(reservation);
-    }
+  // 依照場地id查詢預約
+  public List<Reservation> getReservationsByVenueId(Integer venueId) {
+    return reservationRepository.findAllByVenueIdWithVenueAndStatus(venueId);
+  }
 
-    public void deleteReservation(Integer id) {
-        reservationRepository.deleteById(id);
+  public Reservation createReservation(Reservation reservation) {
+    return reservationRepository.save(reservation);
+  }
+
+  // 更新預約
+  public Reservation updateReservation(Reservation reservation) {
+    // 檢查預約是否存在
+    if (!reservationRepository.existsById(reservation.getReservationId())) {
+      throw new RuntimeException("Reservation not found with id: " + reservation.getReservationId());
     }
+    return reservationRepository.save(reservation);
+  }
+
+  // 刪除預約
+  public void deleteReservation(Integer id) {
+    // 檢查預約是否存在
+    if (!reservationRepository.existsById(id)) {
+      throw new RuntimeException("Reservation not found with id: " + id);
+    }
+    reservationRepository.deleteById(id);
+  }
+
 }

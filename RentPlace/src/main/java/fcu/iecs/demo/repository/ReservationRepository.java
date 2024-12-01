@@ -21,4 +21,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Intege
 
     @Query("SELECT r FROM Reservation r JOIN FETCH r.timePeriod JOIN FETCH r.statusInfo WHERE r.id = :id")
     Optional<Reservation> findByIdWithTimePeriodAndStatus(@Param("id") Integer id);
+
+    @Query("SELECT r FROM Reservation r JOIN FETCH r.venue JOIN FETCH r.statusInfo WHERE r.venue.id = :venueId")
+    List<Reservation> findAllByVenueIdWithVenueAndStatus(@Param("venueId") Integer venueId);
 }
