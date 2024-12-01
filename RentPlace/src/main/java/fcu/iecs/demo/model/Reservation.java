@@ -12,7 +12,8 @@ public class Reservation {
     @Column(name = "reservation_id")
     private Integer reservationId;
 
-    @Column(name = "venue_id", nullable = false)
+    // 標住但不建立關聯
+    @Column(name = "venue_id", insertable = false, updatable = false)
     private Integer venueId;
 
     @Column(name = "user_id", nullable = false)
@@ -35,6 +36,10 @@ public class Reservation {
 
     @Column(name = "status_id")
     private Integer statusId;
+
+    @ManyToOne
+    @JoinColumn(name = "venue_id")  // 這裡指定資料庫中的外鍵欄位名稱
+    private Venue venue;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "time_period_id", referencedColumnName = "time_period_id", insertable = false, updatable = false)
@@ -116,6 +121,14 @@ public class Reservation {
 
     public void setStatusId(Integer statusId) {
         this.statusId = statusId;
+    }
+
+    public Venue getVenue() {
+        return venue;
+    }
+
+    public void setVenue(Venue venue) {
+        this.venue = venue;
     }
 
     public TimePeriod getTimePeriod() {
