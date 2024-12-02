@@ -6,13 +6,52 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import fcu.iecs.demo.qrcode.QRCodeDecoder;
 import java.util.Base64;
+import fcu.iecs.demo.model.Order;
+import fcu.iecs.demo.service.OrderService;
+import java.util.List;
+import java.util.Optional;
+
 @RestController
 @RequestMapping("/api/orders")
 public class OrderController {
 
     @Autowired
     private OrderQRCodeService orderQRCodeService;
+    @Autowired
+    private OrderService orderService;
+    // 查詢所有訂單
+    @GetMapping
+    public List<Order> getAllOrders() {
+        return orderService.getAllOrders();
+    }
 
+    // 根據訂單 ID 查詢訂單
+    @GetMapping("/{orderId}")
+    public ResponseEntity<Order> getOrderById(@PathVariable int orderId) {
+        Optional<Order> order = orderService.getOrderById(orderId);
+        return order.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    // 新增訂單
+    @PostMapping
+    public ResponseEntity<Order> createOrder(@RequestBody Order order) {
+        Order createdOrder = orderService.createOrder(order);
+        return ResponseEntity.ok(createdOrder);
+    }
+
+    // 更新訂單
+    @PutMapping("/{orderId}")
+    public ResponseEntity<Order> updateOrder(@PathVariable int orderId, @RequestBody Order order) {
+        Optional<Order> updatedOrder = orderService.updateOrder(orderId, order);
+        return updatedOrder.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    // 刪除訂單
+    @DeleteMapping("/{orderId}")
+    public ResponseEntity<Void> deleteOrder(@PathVariable int orderId) {
+        boolean isDeleted = orderService.deleteOrder(orderId);
+        return isDeleted ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
+    }
     // 根據訂單 ID 生成 QR Code
     @GetMapping("/{orderId}/qrcode")
     public ResponseEntity<String> generateQRCode(@PathVariable int orderId) {

@@ -18,7 +18,7 @@ public class Order {
 
 
     @Column(name = "payment_id")
-    private int paymentId;
+    private Integer paymentId;
 
     @Column(name = "order_date")
     private String orderDate; // 使用 String 儲存日期，若使用 LocalDate 則需要進行格式化
