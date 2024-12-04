@@ -51,13 +51,14 @@ public class Order {
         this.userId = userId;
     }
 
-    public int getPaymentId() {
+    public Integer getPaymentId() {
         return paymentId;
     }
 
-    public void setPaymentId(int paymentId) {
+    public void setPaymentId(Integer paymentId) {
         this.paymentId = paymentId;
     }
+
 
     public String getOrderDate() {
         return orderDate;
