@@ -10,9 +10,12 @@ import java.util.List;
 
 @Repository
 public interface CloseDateRepository extends JpaRepository<CloseDate, Integer> {
-    @Query("SELECT cd FROM CloseDate cd JOIN FETCH cd.venue JOIN FETCH cd.statusInfo")
-    List<CloseDate> findAllWithVenueAndStatus();
+  @Query("SELECT cd FROM CloseDate cd JOIN FETCH cd.venue JOIN FETCH cd.statusInfo")
+  List<CloseDate> findAllWithVenueAndStatus();
 
-    @Query("SELECT cd FROM CloseDate cd JOIN FETCH cd.venue JOIN FETCH cd.statusInfo WHERE cd.venue.id = :venueId")
-    List<CloseDate> findByVenueIdWithVenueAndStatus(@Param("venueId") Integer venueId);
+  @Query("SELECT cd FROM CloseDate cd JOIN FETCH cd.venue JOIN FETCH cd.statusInfo WHERE cd.venue.id = :venueId")
+  List<CloseDate> findByVenueIdWithVenueAndStatus(@Param("venueId") Integer venueId);
+
+  List<CloseDate> findByVenueId(Integer venueId);
+
 }

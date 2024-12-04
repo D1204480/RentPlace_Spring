@@ -2,7 +2,9 @@ package fcu.iecs.demo.service;
 
 
 
+import fcu.iecs.demo.model.CloseDate;
 import fcu.iecs.demo.model.Reservation;
+import fcu.iecs.demo.repository.CloseDateRepository;
 import fcu.iecs.demo.repository.ReservationRepository;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.extern.slf4j.Slf4j;
@@ -58,10 +60,15 @@ public class ReservationService {
 //  }
 
   private final ReservationRepository reservationRepository;
+  private final CloseDateRepository closeDateRepository;
 
   @Autowired
-  public ReservationService(ReservationRepository reservationRepository) {
+  public ReservationService(
+      ReservationRepository reservationRepository,
+      CloseDateRepository closeDateRepository  // 新增
+  ) {
     this.reservationRepository = reservationRepository;
+    this.closeDateRepository = closeDateRepository;
   }
 
   @Transactional(readOnly = true)
@@ -86,8 +93,18 @@ public class ReservationService {
   public List<Reservation> getReservationsByVenueId(Integer venueId) {
     log.info("Getting reservations by venue id: {}", venueId);
     List<Reservation> reservations = reservationRepository.findAllByVenueIdWithVenueAndStatus(venueId);
-    // 預處理設備分類資訊
-    reservations.forEach(reservation -> reservation.getEquipmentCategories());
+
+    // 取得場地的休館日
+    List<CloseDate> closeDates = closeDateRepository.findByVenueId(venueId);
+
+    // 將休館日資訊加入每個預約中
+    reservations.forEach(reservation -> {
+      if (reservation.getVenue() != null) {
+        reservation.getVenue().setCloseDates(closeDates);
+      }
+      reservation.getEquipmentCategories();
+    });
+
     return reservations;
   }
 
