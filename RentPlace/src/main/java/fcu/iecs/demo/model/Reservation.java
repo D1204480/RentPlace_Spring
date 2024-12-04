@@ -1,8 +1,10 @@
 package fcu.iecs.demo.model;
 
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import java.time.LocalDate;
+import java.util.*;
 
 @Entity
 @Table(name = "Reservations")
@@ -147,4 +149,69 @@ public class Reservation {
         this.statusInfo = statusInfo;
     }
 
+
+    @Transient
+    private Map<String, List<String>> equipmentCategories;
+
+    // 獲取格式化後的時段文字
+    @JsonProperty("timePeriodText")
+    public String getTimePeriodText() {
+        return timePeriod != null ? timePeriod.getTimePeriod() : null;
+    }
+
+    // 獲取格式化後的狀態文字
+    @JsonProperty("statusText")
+    public String getStatusText() {
+        return statusInfo != null ? statusInfo.getStatus() : null;
+    }
+
+    // 獲取分類後的設備清單
+    @JsonProperty("equipmentCategories")
+    public Map<String, List<String>> getEquipmentCategories() {
+        if (venue == null || venue.getEquipment() == null) {
+            return Collections.emptyMap();
+        }
+
+        Map<String, List<String>> categories = new HashMap<>();
+
+        // 基礎設施
+        List<String> basic = new ArrayList<>();
+        // 媒體設備
+        List<String> media = new ArrayList<>();
+        // 無障礙設施
+        List<String> accessibility = new ArrayList<>();
+
+        for (Equipment equipment : venue.getEquipment()) {
+            String name = equipment.getEquipmentName();
+
+            // 根據設備名稱進行分類
+            if (isBasicEquipment(name)) {
+                basic.add(name);
+            } else if (isMediaEquipment(name)) {
+                media.add(name);
+            } else if (isAccessibilityEquipment(name)) {
+                accessibility.add(name);
+            }
+        }
+
+        // 只添加非空的分類
+        if (!basic.isEmpty()) categories.put("basic", basic);
+        if (!media.isEmpty()) categories.put("media", media);
+        if (!accessibility.isEmpty()) categories.put("accessibility", accessibility);
+
+        return categories;
+    }
+
+    // 判斷設備類型的輔助方法
+    private boolean isBasicEquipment(String name) {
+        return Arrays.asList("桌子", "椅子", "冷氣").contains(name);
+    }
+
+    private boolean isMediaEquipment(String name) {
+        return Arrays.asList("麥克風", "音響", "白板").contains(name);
+    }
+
+    private boolean isAccessibilityEquipment(String name) {
+        return Arrays.asList("電梯", "停車場", "無障礙設施").contains(name);
+    }
 }
