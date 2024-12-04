@@ -177,7 +177,7 @@ public class Reservation {
         // 基礎設施
         List<String> basic = new ArrayList<>();
         // 媒體設備
-        List<String> media = new ArrayList<>();
+//        List<String> media = new ArrayList<>();
         // 無障礙設施
         List<String> accessibility = new ArrayList<>();
 
@@ -187,8 +187,8 @@ public class Reservation {
             // 根據設備名稱進行分類
             if (isBasicEquipment(name)) {
                 basic.add(name);
-            } else if (isMediaEquipment(name)) {
-                media.add(name);
+//            } else if (isMediaEquipment(name)) {
+//                media.add(name);
             } else if (isAccessibilityEquipment(name)) {
                 accessibility.add(name);
             }
@@ -196,7 +196,7 @@ public class Reservation {
 
         // 只添加非空的分類
         if (!basic.isEmpty()) categories.put("basic", basic);
-        if (!media.isEmpty()) categories.put("media", media);
+//        if (!media.isEmpty()) categories.put("media", media);
         if (!accessibility.isEmpty()) categories.put("accessibility", accessibility);
 
         return categories;
@@ -204,14 +204,14 @@ public class Reservation {
 
     // 判斷設備類型的輔助方法
     private boolean isBasicEquipment(String name) {
-        return Arrays.asList("桌子", "椅子", "冷氣").contains(name);
+        return Arrays.asList("桌子", "椅子", "冷氣", "麥克風","投影機", "電視機", "音響", "白板").contains(name);
     }
 
-    private boolean isMediaEquipment(String name) {
-        return Arrays.asList("麥克風", "音響", "白板").contains(name);
-    }
+//    private boolean isMediaEquipment(String name) {
+//        return Arrays.asList("麥克風", "音響", "白板").contains(name);
+//    }
 
     private boolean isAccessibilityEquipment(String name) {
-        return Arrays.asList("電梯", "停車場", "無障礙設施").contains(name);
+        return Arrays.asList("飲水機","電梯", "停車場", "無障礙設施").contains(name);
     }
 }
