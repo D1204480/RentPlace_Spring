@@ -50,7 +50,7 @@ public class Reservation {
     // 與 Status 的關聯表
     @ManyToOne(fetch = FetchType.EAGER)  // 確保在查詢 Reservation 時會自動載入關聯的 Status 資訊
     @JoinColumn(name = "status_id", referencedColumnName = "status_id", insertable=false, updatable=false)   // 明確指定關聯欄位
-    private Status statusInfo;
+    private Status timePeriod_statusInfo;
 
     // Getters and Setters
     public Integer getReservationId() {
@@ -141,12 +141,12 @@ public class Reservation {
         this.timePeriod = timePeriod;
     }
 
-    public Status getStatusInfo() {
-        return statusInfo;
+    public Status getTimePeriod_statusInfo() {
+        return timePeriod_statusInfo;
     }
 
-    public void setStatusInfo(Status statusInfo) {
-        this.statusInfo = statusInfo;
+    public void setTimePeriod_statusInfo(Status timePeriod_statusInfo) {
+        this.timePeriod_statusInfo = timePeriod_statusInfo;
     }
 
 
@@ -162,7 +162,7 @@ public class Reservation {
     // 獲取格式化後的狀態文字
     @JsonProperty("statusText")
     public String getStatusText() {
-        return statusInfo != null ? statusInfo.getStatus() : null;
+        return timePeriod_statusInfo != null ? timePeriod_statusInfo.getStatus() : null;
     }
 
     // 獲取分類後的設備清單
