@@ -3,6 +3,7 @@ package fcu.iecs.demo.service;
 
 
 import fcu.iecs.demo.model.CloseDate;
+import fcu.iecs.demo.model.Order;
 import fcu.iecs.demo.model.Reservation;
 import fcu.iecs.demo.repository.CloseDateRepository;
 import fcu.iecs.demo.repository.ReservationRepository;
@@ -13,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -71,6 +73,9 @@ public class ReservationService {
     this.closeDateRepository = closeDateRepository;
   }
 
+  @Autowired
+  private OrderService orderService;
+
   @Transactional(readOnly = true)
   public List<Reservation> getAllReservations() {
     log.info("Getting all reservations");
@@ -109,17 +114,32 @@ public class ReservationService {
   }
 
   @Transactional
-  public Reservation createReservation(Reservation reservation) {
-    log.info("Creating reservation for venue id: {}", reservation.getVenueId());
-    try {
-      Reservation savedReservation = reservationRepository.save(reservation);
-      // 預處理設備分類資訊
-      savedReservation.getEquipmentCategories();
-      return savedReservation;
-    } catch (Exception e) {
-      log.error("Error creating reservation", e);
-      throw new RuntimeException("Failed to create reservation", e);
-    }
+//  public Reservation createReservation(Reservation reservation) {
+//    log.info("Creating reservation for venue id: {}", reservation.getVenueId());
+//    try {
+//      Reservation savedReservation = reservationRepository.save(reservation);
+//      // 預處理設備分類資訊
+//      savedReservation.getEquipmentCategories();
+//      return savedReservation;
+//    } catch (Exception e) {
+//      log.error("Error creating reservation", e);
+//      throw new RuntimeException("Failed to create reservation", e);
+//    }
+//  }
+  public Reservation createReservationWithOrder(Reservation reservation) {
+    // 1. 儲存預訂
+    reservation.setStatusId(5);  // 資料庫status_id:5是待確認
+    Reservation savedReservation = reservationRepository.save(reservation);
+
+    // 2. 創建訂單
+    Order order = new Order();
+    order.setReservationId(savedReservation.getReservationId());
+    order.setUserId(savedReservation.getUserId());
+    order.setOrderDate(LocalDate.now());
+    order.setStatusId(5);
+    orderService.createOrder(order);  // 使用 OrderService 來創建訂單
+
+    return savedReservation;
   }
 
   @Transactional
