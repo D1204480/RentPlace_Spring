@@ -15,12 +15,12 @@ public enum PaymentMethod {
   }
 
   // 添加一個方法來根據中文名稱查找對應的 enum
-  public static PaymentMethod fromDisplayName(String displayName) {
-    for (PaymentMethod method : PaymentMethod.values()) {
-      if (method.getDisplayName().equals(displayName)) {
-        return method;
-      }
-    }
-    throw new IllegalArgumentException("No payment method found for display name: " + displayName);
-  }
+//  public static PaymentMethod fromDisplayName(String displayName) {
+//    for (PaymentMethod method : PaymentMethod.values()) {
+//      if (method.getDisplayName().equals(displayName)) {
+//        return method;
+//      }
+//    }
+//    throw new IllegalArgumentException("No payment method found for display name: " + displayName);
+//  }
 }

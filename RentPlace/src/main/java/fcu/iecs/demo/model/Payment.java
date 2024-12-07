@@ -18,6 +18,7 @@ public class Payment {
   @Column(name = "payment_date")
   private LocalDateTime paymentDate;
 
+  // 回傳要給前端看的 payment_method 的顯示名稱
   public String getPaymentMethodDisplay() {
     return paymentMethod != null ? paymentMethod.getDisplayName() : "";
   }
