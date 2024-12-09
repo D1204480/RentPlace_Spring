@@ -58,4 +58,8 @@ public class Venue {
     @OneToMany(mappedBy = "venue")
     @JsonIgnoreProperties("venue")
     private List<Equipment> equipment;
+
+    @OneToMany(mappedBy = "venue")
+    @JsonIgnoreProperties({"venue"})
+    private List<CloseDate> closeDates;
 }

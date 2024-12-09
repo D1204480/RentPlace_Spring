@@ -1,5 +1,6 @@
 package fcu.iecs.demo.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
@@ -27,7 +28,7 @@ public class CloseDate {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "status_id", referencedColumnName = "status_id", insertable = false, updatable = false)
-    private Status status;
+    private Status statusInfo;
 
     // getters and setters
     public Integer getCloseDateId() {
@@ -71,10 +72,10 @@ public class CloseDate {
     }
 
     public Status getStatus() {
-        return status;
+        return statusInfo;
     }
 
     public void setStatus(Status status) {
-        this.status = status;
+        this.statusInfo = statusInfo;
     }
 }
