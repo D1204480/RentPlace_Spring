@@ -127,8 +127,15 @@ public class ReservationService {
 //    }
 //  }
   public Reservation createReservationWithOrder(Reservation reservation) {
-    // 1. 儲存預訂
+    // 1. 設定初始狀態
     reservation.setStatusId(5);  // 資料庫status_id:5是待確認
+
+    // 如果有設備ID，處理設備關聯
+    if (reservation.getEquipmentIds() != null && !reservation.getEquipmentIds().isEmpty()) {
+      reservation.setEquipmentIds(reservation.getEquipmentIds());
+    }
+
+    // 儲存預訂
     Reservation savedReservation = reservationRepository.save(reservation);
 
     // 2. 創建訂單

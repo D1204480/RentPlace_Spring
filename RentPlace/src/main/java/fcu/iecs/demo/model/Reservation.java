@@ -51,6 +51,11 @@ public class Reservation {
     @JoinColumn(name = "status_id", referencedColumnName = "status_id", insertable=false, updatable=false)   // 明確指定關聯欄位
     private Status timePeriod_statusInfo;
 
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "reservation_id", referencedColumnName = "reservation_id")
+    private Set<ReservationEquipment> reservationEquipments = new HashSet<>();
+
+
     // Getters and Setters
     public Integer getReservationId() {
         return reservationId;
@@ -148,6 +153,36 @@ public class Reservation {
         this.timePeriod_statusInfo = timePeriod_statusInfo;
     }
 
+    // 新增處理設備ID的方法
+    @Transient  // 這個欄位不會映射到資料庫
+    private List<Integer> equipmentIds;
+
+    public List<Integer> getEquipmentIds() {
+        return equipmentIds;
+    }
+
+    public void setEquipmentIds(List<Integer> equipmentIds) {
+        this.equipmentIds = equipmentIds;
+        if (equipmentIds != null) {
+            this.reservationEquipments.clear();
+            for (Integer equipmentId : equipmentIds) {
+                ReservationEquipment re = new ReservationEquipment();
+                re.setReservationId(this.getReservationId());  // 設置預訂ID
+                re.setEquipmentId(equipmentId);
+                this.reservationEquipments.add(re);
+            }
+        }
+    }
+
+    // 新增 getter/setter
+    public Set<ReservationEquipment> getReservationEquipments() {
+        return reservationEquipments;
+    }
+
+    public void setReservationEquipments(Set<ReservationEquipment> reservationEquipments) {
+        this.reservationEquipments = reservationEquipments;
+    }
+
 
     @Transient
     private Map<String, List<String>> equipmentCategories;
@@ -213,4 +248,6 @@ public class Reservation {
     private boolean isAccessibilityEquipment(String name) {
         return Arrays.asList("飲水機","電梯", "停車場", "無障礙設施").contains(name);
     }
+
+
 }
