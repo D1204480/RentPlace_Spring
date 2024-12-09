@@ -1,6 +1,5 @@
 package fcu.iecs.demo.qrcode;
 
-import com.google.gson.Gson;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.WriterException;
 import com.google.zxing.client.j2se.MatrixToImageConfig;
@@ -10,24 +9,28 @@ import com.google.zxing.qrcode.QRCodeWriter;
 
 import java.io.ByteArrayOutputStream;
 import java.util.Base64;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class QRCodeGenerator {
 
-    // 將訂單資料轉換為 JSON 字串並生成 QR Code
-    public static String generateQRCode(Object object, int width, int height) throws WriterException {
-        // 使用 Gson 將物件轉為 JSON 字串
-        Gson gson = new Gson();
-        String qrContent = gson.toJson(object);
+    private static final Logger logger = Logger.getLogger(QRCodeGenerator.class.getName());
 
-        // 使用 ZXing 生成 QR Code
-        QRCodeWriter qrCodeWriter = new QRCodeWriter();
-        BitMatrix bitMatrix = qrCodeWriter.encode(qrContent, BarcodeFormat.QR_CODE, width, height);
+    public static String generateQRCodeFromString(String content, int width, int height) throws WriterException {
+        try {
+            if (content.length() > 2000) {
+                throw new IllegalArgumentException("QR Code content is too long to encode. Length: " + content.length());
+            }
 
-        // 將 QR Code 轉換為 Base64 編碼的 PNG 圖片
-        try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
-            MatrixToImageWriter.writeToStream(bitMatrix, "PNG", byteArrayOutputStream, new MatrixToImageConfig());
-            return Base64.getEncoder().encodeToString(byteArrayOutputStream.toByteArray());
+            QRCodeWriter qrCodeWriter = new QRCodeWriter();
+            BitMatrix bitMatrix = qrCodeWriter.encode(content, BarcodeFormat.QR_CODE, width, height);
+
+            try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
+                MatrixToImageWriter.writeToStream(bitMatrix, "PNG", byteArrayOutputStream, new MatrixToImageConfig());
+                return Base64.getEncoder().encodeToString(byteArrayOutputStream.toByteArray());
+            }
         } catch (Exception e) {
+            logger.log(Level.SEVERE, "Error generating QR Code", e);
             throw new RuntimeException("Error generating QR Code", e);
         }
     }

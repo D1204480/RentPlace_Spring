@@ -3,38 +3,79 @@ package fcu.iecs.demo.service;
 import fcu.iecs.demo.model.Order;
 import fcu.iecs.demo.repository.OrderRepository;
 import fcu.iecs.demo.qrcode.QRCodeGenerator;
+import fcu.iecs.demo.util.AESUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @Service
 public class OrderQRCodeService {
 
+    private static final Logger logger = Logger.getLogger(OrderQRCodeService.class.getName());
+
     @Autowired
     private OrderRepository orderRepository;
 
-    // 用於儲存 QR Code 的變數，這裡我們假設每個訂單會對應一個 QR Code
-    private String lastGeneratedQRCode = "";
+    private String secretKey = "1234567890123456"; // 密鑰建議從環境變數獲取
+    private String lastGeneratedQRCode; // 用於保存最近生成的 QR Code
 
-    // 根據 orderId 生成 QR Code
+    // 生成加密的 QR Code
     public String generateQRCodeForOrder(int orderId) {
         try {
-            // 從資料庫查詢訂單資料
+            // 查詢訂單
+            logger.info("Fetching order with ID: " + orderId);
             Order order = orderRepository.findByOrderId(orderId);
-
             if (order == null) {
-                throw new RuntimeException("Order not found");
+                logger.warning("Order not found for ID: " + orderId);
+                throw new RuntimeException("Order not found for ID: " + orderId);
             }
 
-            // 生成 QR Code 並返回 Base64 字串
-            return QRCodeGenerator.generateQRCode(order, 300, 300); // 300x300 大小的 QR Code
+            // 動態因子，例如 UUID 或時間戳
+            String dynamicFactor = UUID.randomUUID().toString();
+
+            // 原始內容
+            String rawContent = String.format(
+                    "Order ID: %d\nUser ID: %s\nReservation ID: %d\nOrder Date: %s\nStatus ID: %d\nDynamic: %s",
+                    order.getOrderId(),
+                    order.getUserId(),
+                    order.getReservationId(),
+                    order.getOrderDate(),
+                    order.getStatusId(),
+                    dynamicFactor
+            );
+
+            // 加密內容
+            String encryptedContent = AESUtil.encrypt(rawContent, secretKey);
+            logger.info("Encrypted QR Code content: " + encryptedContent);
+
+            // 生成 QR Code
+            lastGeneratedQRCode = QRCodeGenerator.generateQRCodeFromString(encryptedContent, 300, 300);
+            return lastGeneratedQRCode;
+
         } catch (Exception e) {
-            // 捕獲並處理異常
+            logger.log(Level.SEVERE, "Error generating QR Code for order ID: " + orderId, e);
             throw new RuntimeException("Error generating QR Code for order " + orderId, e);
         }
     }
 
-    // 提供一個方法來返回當前最新的 QR Code
+    // 獲取最近生成的 QR Code
     public String getLastGeneratedQRCode() {
+        if (lastGeneratedQRCode == null) {
+            throw new RuntimeException("No QR Code has been generated yet");
+        }
         return lastGeneratedQRCode;
+    }
+
+    // 解密 QR Code 內容
+    public String decryptQRCodeContent(String encryptedContent) {
+        try {
+            return AESUtil.decrypt(encryptedContent, secretKey);
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Error decrypting QR Code content", e);
+            throw new RuntimeException("Error decrypting QR Code content", e);
+        }
     }
 }
