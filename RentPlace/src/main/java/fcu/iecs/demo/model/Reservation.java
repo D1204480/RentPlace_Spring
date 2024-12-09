@@ -56,6 +56,7 @@ public class Reservation {
     private Set<ReservationEquipment> reservationEquipments = new HashSet<>();
 
 
+
     // Getters and Setters
     public Integer getReservationId() {
         return reservationId;
