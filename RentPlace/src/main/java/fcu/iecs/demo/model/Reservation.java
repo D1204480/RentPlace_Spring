@@ -14,8 +14,7 @@ public class Reservation {
     @Column(name = "reservation_id")
     private Integer reservationId;
 
-    // 標住但不建立關聯
-    @Column(name = "venue_id", insertable = false, updatable = false)
+    @Column(name = "venue_id", nullable = false)
     private Integer venueId;
 
     @Column(name = "user_id", nullable = false)
@@ -40,7 +39,7 @@ public class Reservation {
     private Integer statusId;
 
     @ManyToOne
-    @JoinColumn(name = "venue_id")  // 這裡指定資料庫中的外鍵欄位名稱
+    @JoinColumn(name = "venue_id", insertable = false, updatable = false)  // 這裡指定資料庫中的外鍵欄位名稱
     private Venue venue;
 
     @ManyToOne(fetch = FetchType.EAGER)

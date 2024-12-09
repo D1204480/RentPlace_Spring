@@ -4,8 +4,10 @@ package fcu.iecs.demo.controller;
 
 import fcu.iecs.demo.model.Reservation;
 import fcu.iecs.demo.service.ReservationService;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -94,6 +96,31 @@ public class ReservationController {
 //  }
   public ResponseEntity<Map<String, Object>> createReservation(@RequestBody Reservation reservation) {
     try {
+      // 印出接收到的資料
+      log.info("Received reservation data: {}", reservation);
+
+      // 檢查必要欄位
+      if (reservation.getVenueId() == null) {
+        Map<String, Object> errorResponse = new HashMap<>();
+        errorResponse.put("error", "場地ID不能為空");
+        return ResponseEntity.badRequest().body(errorResponse);
+      }
+      if (reservation.getUserId() == null) {
+        Map<String, Object> errorResponse = new HashMap<>();
+        errorResponse.put("error", "使用者ID不能為空");
+        return ResponseEntity.badRequest().body(errorResponse);
+      }
+      if (reservation.getTimePeriodId() == null) {
+        Map<String, Object> errorResponse = new HashMap<>();
+        errorResponse.put("error", "時段ID不能為空");
+        return ResponseEntity.badRequest().body(errorResponse);
+      }
+      if (reservation.getReservationDate() == null) {
+        Map<String, Object> errorResponse = new HashMap<>();
+        errorResponse.put("error", "預約日期不能為空");
+        return ResponseEntity.badRequest().body(errorResponse);
+      }
+
       Reservation savedReservation = reservationService.createReservationWithOrder(reservation);
 
       Map<String, Object> response = new HashMap<>();
@@ -101,10 +128,15 @@ public class ReservationController {
       response.put("message", "預訂成功");
 
       return ResponseEntity.ok(response);
+
     } catch (Exception e) {
-      e.printStackTrace();
+      log.error("預訂創建失敗，接收到的資料: {}", reservation, e);
+      Map<String, Object> errorResponse = new HashMap<>();
+      errorResponse.put("error", "預訂創建失敗");
+      errorResponse.put("message", e.getMessage());
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+          .body(errorResponse);
     }
-    return null;
   }
 
   @PutMapping("/{id}")
