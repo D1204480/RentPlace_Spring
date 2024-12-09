@@ -17,7 +17,7 @@ public class Reservation {
     @Column(name = "venue_id", nullable = false)
     private Integer venueId;
 
-    @Column(name = "user_id", nullable = false)
+    @Column(name = "user_id", length = 50, nullable = false)
     private String userId;
 
     @Column(name = "time_period_id", nullable = false)
