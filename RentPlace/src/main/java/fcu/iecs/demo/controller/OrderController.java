@@ -30,13 +30,14 @@ public class OrderController {
     return new ResponseEntity<>(savedOrder, HttpStatus.CREATED);
   }
 
-  @GetMapping("/{id}")
-  public ResponseEntity<Order> getOrder(@PathVariable Integer id) {
-    Order order = orderService.getOrderById(id);
-    return ResponseEntity.ok(order);
-  }
+    @GetMapping("/{id:\\d+}")
+    public ResponseEntity<Order> getOrder(@PathVariable Integer id) {
+        Order order = orderService.getOrderById(id);
+        return ResponseEntity.ok(order);
+    }
 
-  @GetMapping("/reservation/{reservationId}")
+
+    @GetMapping("/reservation/{reservationId}")
   public ResponseEntity<Order> getOrderByReservationId(@PathVariable Integer reservationId) {
     Order order = orderService.getOrderByReservationId(reservationId);
     return ResponseEntity.ok(order);
@@ -129,4 +130,17 @@ public class OrderController {
             return ResponseEntity.status(400).body("Error decrypting QR Code: " + e.getMessage());
         }
     }
+    @GetMapping("/latest")
+    public ResponseEntity<Order> getLatestOrder() {
+        try {
+            Order latestOrder = orderService.getLatestOrder();
+            if (latestOrder == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            }
+            return ResponseEntity.ok(latestOrder);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
 }
