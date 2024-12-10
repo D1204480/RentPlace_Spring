@@ -68,9 +68,10 @@ public class SecurityConfig {
                 "/api/close-dates/**",
                 "/api/payments/**",
                 "api/orders/**",
+                    "/api/orders/qrcode/decode",
                     "api/orders/latest-qrcode",
-                    "api/orders/qr-code/{encryptedContent}",
-                           " /api/orders/qrcode/decode"
+                    "api/orders/qr-code/{encryptedContent}"
+
             ).permitAll()
             .anyRequest().authenticated()
         )

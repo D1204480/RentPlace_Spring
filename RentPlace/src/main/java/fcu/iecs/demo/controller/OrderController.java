@@ -11,8 +11,7 @@ import java.time.LocalDate;
 import java.util.List;
 import fcu.iecs.demo.service.OrderQRCodeService;
 import fcu.iecs.demo.qrcode.QRCodeDecoder;
-import java.util.Base64;
-import java.util.Optional;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/orders")
@@ -90,16 +89,23 @@ public class OrderController {
   }
 
     @PostMapping("/qrcode/decode")
-    public ResponseEntity<String> decodeQRCode(@RequestBody String base64Image) {
+    public ResponseEntity<String> decodeQRCode(@RequestParam("file") MultipartFile file) {
         try {
-            String imageData = base64Image.split(",")[1];
-            byte[] decodedBytes = Base64.getDecoder().decode(imageData);
-            String decodedText = QRCodeDecoder.decodeQRCode(decodedBytes);
+            // 獲取圖片的二進制數據
+            byte[] fileBytes = file.getBytes();
+
+            // 使用 QRCodeDecoder 進行解碼
+            String decodedText = QRCodeDecoder.decodeQRCode(fileBytes);
+            if (decodedText == null || decodedText.isEmpty()) {
+                return ResponseEntity.status(400).body("無法解碼 QR Code，請確認圖片是否有效。");
+            }
+
             return ResponseEntity.ok(decodedText);
         } catch (Exception e) {
-            return ResponseEntity.status(400).body("Invalid QR Code");
+            return ResponseEntity.status(400).body("解碼失敗，錯誤原因：" + e.getMessage());
         }
     }
+
 
     @GetMapping("/latest-qrcode")
     public ResponseEntity<byte[]> getLatestQRCode() {
