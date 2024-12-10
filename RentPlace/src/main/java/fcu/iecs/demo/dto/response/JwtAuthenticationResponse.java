@@ -12,6 +12,7 @@ import java.util.List;
 public class JwtAuthenticationResponse {
   private String token;
   private String type;
+  private String userId;
   private String username;
   private String email;
   private String phone;
