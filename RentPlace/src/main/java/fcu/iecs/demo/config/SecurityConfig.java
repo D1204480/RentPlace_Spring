@@ -70,7 +70,9 @@ public class SecurityConfig {
                 "api/orders/**",
                     "/api/orders/qrcode/decode",
                     "api/orders/latest-qrcode",
-                    "api/orders/qr-code/{encryptedContent}"
+                    "api/orders/qr-code/{encryptedContent}",
+                    "api/orders/qrcode/decode",
+                    "api/orders/qrcode/decrypt"
 
             ).permitAll()
             .anyRequest().authenticated()
