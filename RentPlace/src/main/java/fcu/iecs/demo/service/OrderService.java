@@ -40,7 +40,7 @@ public class OrderService {
     return orderRepository.findAll();
   }
   public Order getLatestOrder() {
-    return orderRepository.findTopByOrderByOrderDateDesc();
+    return orderRepository.findTopByOrderByOrderIdDesc();
   }
 
   @Transactional

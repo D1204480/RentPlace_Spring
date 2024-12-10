@@ -19,7 +19,7 @@ public class OrderController {
 
   @Autowired
     private OrderQRCodeService orderQRCodeService;
-    
+
   @Autowired
   private OrderService orderService;
 
@@ -111,15 +111,16 @@ public class OrderController {
     @GetMapping("/latest-qrcode")
     public ResponseEntity<byte[]> getLatestQRCode() {
         try {
-            byte[] latestQRCodeBytes = orderQRCodeService.getLatestGeneratedQRCode();
+            byte[] qrCodeBytes = orderQRCodeService.generateQRCodeForLatestOrder();
             return ResponseEntity.ok()
                     .header("Content-Type", "image/png")
                     .header("Content-Disposition", "attachment; filename=\"latest-qrcode.png\"")
-                    .body(latestQRCodeBytes);
+                    .body(qrCodeBytes);
         } catch (RuntimeException e) {
-            return ResponseEntity.status(500).body(null);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
+
 
     @PostMapping("/qrcode/decrypt")
     public ResponseEntity<String> decryptQRCode(@RequestBody String encryptedContent) {
@@ -142,5 +143,5 @@ public class OrderController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
-
 }
+

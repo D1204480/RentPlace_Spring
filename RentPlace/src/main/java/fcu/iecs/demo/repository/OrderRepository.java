@@ -14,7 +14,7 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
   Optional<Order> findByReservationId(Integer reservationId);
   Order findByOrderId(int orderId);
 
-    Order findTopByOrderByOrderDateDesc();
+  Order findTopByOrderByOrderIdDesc();
 }
 
 
