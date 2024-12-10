@@ -77,19 +77,21 @@ public class OrderController {
 
   // 根據訂單 ID 生成 QR Code
   @GetMapping("/{orderId}/qrcode")
-  public ResponseEntity<String> generateQRCode(@PathVariable int orderId) {
+  public ResponseEntity<byte[]> generateQRCode(@PathVariable int orderId) {
       try {
-          String qrCodeBase64 = orderQRCodeService.generateQRCodeForOrder(orderId);
-          return ResponseEntity.ok(qrCodeBase64);
+          byte[] qrCodeBytes = orderQRCodeService.generateQRCodeForOrder(orderId);
+          return ResponseEntity.ok()
+                  .header("Content-Type", "image/png")
+                  .header("Content-Disposition", "attachment; filename=\"qrcode.png\"")
+                  .body(qrCodeBytes);
       } catch (RuntimeException e) {
-          return ResponseEntity.status(500).body("Error generating QR Code: " + e.getMessage());
+          return ResponseEntity.status(500).body(null);
       }
   }
 
     @PostMapping("/qrcode/decode")
     public ResponseEntity<String> decodeQRCode(@RequestBody String base64Image) {
         try {
-            // 去掉 Base64 的前綴
             String imageData = base64Image.split(",")[1];
             byte[] decodedBytes = Base64.getDecoder().decode(imageData);
             String decodedText = QRCodeDecoder.decodeQRCode(decodedBytes);
@@ -100,12 +102,15 @@ public class OrderController {
     }
 
     @GetMapping("/latest-qrcode")
-    public ResponseEntity<String> getLatestQRCode() {
+    public ResponseEntity<byte[]> getLatestQRCode() {
         try {
-            String qrCodeBase64 = orderQRCodeService.getLastGeneratedQRCode();
-            return ResponseEntity.ok(qrCodeBase64);
+            byte[] latestQRCodeBytes = orderQRCodeService.getLatestGeneratedQRCode();
+            return ResponseEntity.ok()
+                    .header("Content-Type", "image/png")
+                    .header("Content-Disposition", "attachment; filename=\"latest-qrcode.png\"")
+                    .body(latestQRCodeBytes);
         } catch (RuntimeException e) {
-            return ResponseEntity.status(500).body("Error retrieving QR Code: " + e.getMessage());
+            return ResponseEntity.status(500).body(null);
         }
     }
 
