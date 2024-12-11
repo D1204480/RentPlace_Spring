@@ -58,7 +58,7 @@ public class SecurityConfig {
                 "/api/send-verification-code",
                 "/api/verify-code",
                 "/api/auth/**",
-                "/api/user",
+                "/api/user/**",
                 "/api/login",
                 "/api/public/**",
                 "/api/venues/**",

@@ -196,6 +196,7 @@ public class AuthService {
       return new JwtAuthenticationResponse(
           jwt,
           "Bearer",
+          user.getUserId(),
           user.getUsername(),
           user.getEmail(),
           user.getPhone()
@@ -227,6 +228,7 @@ public class AuthService {
       return new JwtAuthenticationResponse(
           jwt,
           "Bearer",
+          user.getUserId(),
           user.getUsername(),
           user.getEmail(),
           user.getPhone());
