@@ -4,8 +4,10 @@ package fcu.iecs.demo.service;
 
 import fcu.iecs.demo.model.CloseDate;
 import fcu.iecs.demo.model.Order;
+import fcu.iecs.demo.model.Payment;
 import fcu.iecs.demo.model.Reservation;
 import fcu.iecs.demo.repository.CloseDateRepository;
+import fcu.iecs.demo.repository.PaymentRepository;
 import fcu.iecs.demo.repository.ReservationRepository;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -63,18 +66,22 @@ public class ReservationService {
 
   private final ReservationRepository reservationRepository;
   private final CloseDateRepository closeDateRepository;
+  private final PaymentRepository paymentRepository;
+  private final OrderService orderService;
 
   @Autowired
   public ReservationService(
       ReservationRepository reservationRepository,
-      CloseDateRepository closeDateRepository  // 新增
+      CloseDateRepository closeDateRepository,
+      PaymentRepository paymentRepository,
+      OrderService orderService
   ) {
     this.reservationRepository = reservationRepository;
     this.closeDateRepository = closeDateRepository;
+    this.paymentRepository = paymentRepository;
+    this.orderService = orderService;
   }
 
-  @Autowired
-  private OrderService orderService;
 
   @Transactional(readOnly = true)
   public List<Reservation> getAllReservations() {
@@ -135,15 +142,22 @@ public class ReservationService {
       reservation.setEquipmentIds(reservation.getEquipmentIds());
     }
 
-    // 儲存預訂
+    // 2. 儲存預訂
     Reservation savedReservation = reservationRepository.save(reservation);
 
-    // 2. 創建訂單
+    // 3. 創建付款記錄
+    Payment payment = new Payment();
+    payment.setPaymentMethod(reservation.getPaymentMethod());
+    payment.setPaymentDate(LocalDateTime.now());
+    Payment savedPayment = paymentRepository.save(payment);
+
+    // 4. 創建訂單
     Order order = new Order();
     order.setReservationId(savedReservation.getReservationId());
     order.setUserId(savedReservation.getUserId());
     order.setOrderDate(LocalDate.now());
     order.setStatusId(5);
+    order.setPaymentId(savedPayment.getPaymentId());  // 關聯付款記錄
     orderService.createOrder(order);  // 使用 OrderService 來創建訂單
 
     return savedReservation;
