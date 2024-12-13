@@ -45,7 +45,7 @@ public class EmailService {
       // 建立郵件訊息
       MimeMessage message = mailSender.createMimeMessage();
       MimeMessageHelper helper = new MimeMessageHelper(message);
-      helper.setFrom("your-email@example.com");
+      helper.setFrom("devilwoops@gmail.com");
       helper.setTo(email);
       helper.setSubject("您的驗證碼");
       helper.setText("您的驗證碼是: " + verificationCode);
