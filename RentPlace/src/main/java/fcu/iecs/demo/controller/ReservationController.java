@@ -110,9 +110,9 @@ public class ReservationController {
         errorResponse.put("error", "使用者ID不能為空");
         return ResponseEntity.badRequest().body(errorResponse);
       }
-      if (reservation.getTimePeriodId() == null) {
+      if (reservation.getTimePeriodIds() == null || reservation.getTimePeriodIds().isEmpty()) {
         Map<String, Object> errorResponse = new HashMap<>();
-        errorResponse.put("error", "時段ID不能為空");
+        errorResponse.put("error", "時段不能為空");
         return ResponseEntity.badRequest().body(errorResponse);
       }
       if (reservation.getReservationDate() == null) {

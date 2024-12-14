@@ -20,7 +20,7 @@ public class Reservation {
   @Column(name = "user_id", length = 50, nullable = false)
   private String userId;
 
-  @Column(name = "time_period_id", nullable = false)
+  @Column(name = "time_period_id")
   private Integer timePeriodId;
 
   @Column(name = "reservation_date", nullable = false)
@@ -194,6 +194,32 @@ public class Reservation {
 
   public void setReservationEquipments(Set<ReservationEquipment> reservationEquipments) {
     this.reservationEquipments = reservationEquipments;
+  }
+
+
+  // 修改單一時段為多時段
+  @Transient  // 用於接收前端資料,不存入資料庫
+  private List<Integer> timePeriodIds; // 改為複數
+
+  @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+  @JoinColumn(name = "reservation_id")
+  private Set<ReservationTimePeriod> reservationTimePeriods = new HashSet<>();
+
+  // 新增 getter/setter
+  public List<Integer> getTimePeriodIds() {
+    return timePeriodIds;
+  }
+
+  public void setTimePeriodIds(List<Integer> timePeriodIds) {
+    this.timePeriodIds = timePeriodIds;
+    if (timePeriodIds != null) {
+      this.reservationTimePeriods.clear();
+      for (Integer timePeriodId : timePeriodIds) {
+        ReservationTimePeriod rtp = new ReservationTimePeriod();
+        rtp.setTimePeriodId(timePeriodId);
+        this.reservationTimePeriods.add(rtp);
+      }
+    }
   }
 
 

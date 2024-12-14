@@ -137,13 +137,18 @@ public class ReservationService {
     // 1. 設定初始狀態
     reservation.setStatusId(5);  // 資料庫status_id:5是待確認
 
+    // 處理多時段，預約時段關聯（只在這裡處理一次）
+    if (reservation.getTimePeriodIds() != null && !reservation.getTimePeriodIds().isEmpty()) {
+      reservation.setTimePeriodIds(reservation.getTimePeriodIds());
+    }
+
+    // 儲存預訂
+    Reservation savedReservation = reservationRepository.save(reservation);
+
     // 如果有設備ID，處理設備關聯
     if (reservation.getEquipmentIds() != null && !reservation.getEquipmentIds().isEmpty()) {
       reservation.setEquipmentIds(reservation.getEquipmentIds());
     }
-
-    // 2. 儲存預訂
-    Reservation savedReservation = reservationRepository.save(reservation);
 
     // 3. 創建付款記錄
     Payment payment = new Payment();
