@@ -163,6 +163,7 @@ public class ReservationService {
     order.setOrderDate(LocalDate.now());
     order.setStatusId(5);
     order.setPaymentId(savedPayment.getPaymentId());  // 關聯付款記錄
+    order.setTotalAmount(reservation.getTotalAmount());  // 使用前端傳回的總金額
     orderService.createOrder(order);  // 使用 OrderService 來創建訂單
 
     return savedReservation;

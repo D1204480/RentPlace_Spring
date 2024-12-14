@@ -3,6 +3,7 @@ package fcu.iecs.demo.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
@@ -27,6 +28,9 @@ public class Order {
 
   @Column(name = "status_id")
   private Integer statusId;
+
+  @Column(name = "total_amount")
+  private BigDecimal totalAmount;
 
   // 關聯
   @ManyToOne(fetch = FetchType.EAGER)
@@ -103,5 +107,13 @@ public class Order {
 
   public Status getStatus() {
     return status;
+  }
+
+  public BigDecimal getTotalAmount() {
+    return totalAmount;
+  }
+
+  public void setTotalAmount(BigDecimal totalAmount) {
+    this.totalAmount = totalAmount;
   }
 }

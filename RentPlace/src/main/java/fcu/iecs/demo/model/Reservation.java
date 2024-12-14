@@ -3,6 +3,8 @@ package fcu.iecs.demo.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
+
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -196,6 +198,17 @@ public class Reservation {
     this.reservationEquipments = reservationEquipments;
   }
 
+  @Transient  // 不儲存到資料庫
+  private BigDecimal totalAmount;
+
+  public BigDecimal getTotalAmount() {
+    return totalAmount;
+  }
+
+  public void setTotalAmount(BigDecimal totalAmount) {
+    this.totalAmount = totalAmount;
+  }
+
 
   // 修改單一時段為多時段
   @Transient  // 用於接收前端資料,不存入資料庫
@@ -223,9 +236,6 @@ public class Reservation {
   }
 
 
-  @Transient
-  private Map<String, List<String>> equipmentCategories;
-
   // 獲取格式化後的時段文字
   @JsonProperty("timePeriodText")
   public String getTimePeriodText() {
@@ -237,6 +247,10 @@ public class Reservation {
   public String getStatusText() {
     return timePeriod_statusInfo != null ? timePeriod_statusInfo.getStatus() : null;
   }
+
+
+  @Transient
+  private Map<String, List<String>> equipmentCategories;
 
   // 獲取分類後的設備清單
   @JsonProperty("equipmentCategories")
