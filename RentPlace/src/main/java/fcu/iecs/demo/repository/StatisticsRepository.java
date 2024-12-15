@@ -26,10 +26,10 @@ public interface StatisticsRepository extends JpaRepository<Reservation, Integer
   List<Object[]> getPaymentStats();
 
   @Query(value =
-      "SELECT venue_id, COUNT(*) AS reserved_times, " +
+      "SELECT v.venue_id, v.venue_name, COUNT(*) AS reserved_times, " +
           "(COUNT(*) / (SELECT COUNT(*) FROM Reservations r2)) * 100 AS usage_rate " +
-          "FROM Reservations r " +
+          "FROM Reservations r, Venue v " +
           "WHERE r.status_id = 4 " +
-          "GROUP BY venue_id", nativeQuery = true)
+          "GROUP BY v.venue_id", nativeQuery = true)
   List<Object[]> getVenueStats();
 }

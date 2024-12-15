@@ -43,9 +43,10 @@ public class StatisticsService {
     return statisticsRepository.getVenueStats().stream()
         .map(row -> {
           VenueStatsDTO dto = new VenueStatsDTO();
-          dto.setVenueId(((Number) row[0]).longValue());
-          dto.setReservedTimes(((Number) row[1]).longValue());
-          dto.setUsageRate(((Number) row[2]).doubleValue());
+          dto.setVenueId(((Number) row[0]).intValue());
+          dto.setVenueName(((String) row[1]));
+          dto.setReservedTimes(((Number) row[2]).longValue());
+          dto.setUsageRate(((Number) row[3]).doubleValue());
           return dto;
         })
         .collect(Collectors.toList());
