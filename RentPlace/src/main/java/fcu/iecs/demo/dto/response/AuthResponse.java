@@ -1,6 +1,8 @@
 // src/main/java/com/your/package/dto/response/AuthResponse.java
 package fcu.iecs.demo.dto.response;
 
+import fcu.iecs.demo.dto.UserDTO;
+
 public class AuthResponse {
   private String accessToken;
   private UserDTO user;
