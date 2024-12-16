@@ -1,11 +1,9 @@
 // src/main/java/com/your/package/dto/response/UserDTO.java
-package fcu.iecs.demo.dto.response;
+package fcu.iecs.demo.dto;
 
 
 import fcu.iecs.demo.model.User;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.util.Date;
 

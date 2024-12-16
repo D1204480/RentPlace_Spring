@@ -3,6 +3,7 @@ package fcu.iecs.demo.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
@@ -28,17 +29,20 @@ public class Order {
   @Column(name = "status_id")
   private Integer statusId;
 
-  @JsonIgnore
+  @Column(name = "total_amount")
+  private BigDecimal totalAmount;
+
+  // 關聯
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "reservation_id", insertable = false, updatable = false)
   private Reservation reservation;
 
-  @JsonIgnore
+  // 關聯
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "payment_id", insertable = false, updatable = false)
   private Payment payment;
 
-  @JsonIgnore
+  // 關聯
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "status_id", insertable = false, updatable = false)
   private Status status;
@@ -90,5 +94,26 @@ public class Order {
 
   public void setStatusId(Integer statusId) {
     this.statusId = statusId;
+  }
+
+  // 關聯的 Getters and Setters
+  public Reservation getReservation() {
+    return reservation;
+  }
+
+  public Payment getPayment() {
+    return payment;
+  }
+
+  public Status getStatus() {
+    return status;
+  }
+
+  public BigDecimal getTotalAmount() {
+    return totalAmount;
+  }
+
+  public void setTotalAmount(BigDecimal totalAmount) {
+    this.totalAmount = totalAmount;
   }
 }
