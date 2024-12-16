@@ -135,7 +135,7 @@ public class ReservationService {
 //  }
   public Reservation createReservationWithOrder(Reservation reservation) {
     // 1. 設定初始狀態
-    reservation.setStatusId(5);  // 資料庫status_id:5是待確認
+    reservation.setStatusId(4);  // 資料庫status_id:5是待確認
 
     // 處理多時段，預約時段關聯（只在這裡處理一次）
     if (reservation.getTimePeriodIds() != null && !reservation.getTimePeriodIds().isEmpty()) {

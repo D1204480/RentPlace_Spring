@@ -14,7 +14,8 @@ public interface StatisticsRepository extends JpaRepository<Reservation, Integer
           "COUNT(*) AS total_reservations, " +
           "SUM(o.total_amount) AS total_revenue " +
           "FROM Reservations r, Orders o " +
-          "WHERE o.status_id = 5 " +
+          "WHERE o.reservation_id = r.reservation_id " +
+          "  AND o.status_id = 5 " +
           "GROUP BY month ORDER BY month;", nativeQuery = true)
   List<Object[]> getMonthlyStats();
 
