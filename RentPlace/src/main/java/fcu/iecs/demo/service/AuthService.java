@@ -2,18 +2,15 @@ package fcu.iecs.demo.service;
 
 import fcu.iecs.demo.dto.request.GoogleLoginRequest;
 import fcu.iecs.demo.dto.request.LoginRequest;
-import fcu.iecs.demo.dto.request.RegisterRequest;
 import fcu.iecs.demo.dto.response.AuthResponse;
 import fcu.iecs.demo.dto.response.JwtAuthenticationResponse;
-import fcu.iecs.demo.dto.response.UserDTO;
+import fcu.iecs.demo.dto.UserDTO;
 import fcu.iecs.demo.model.User;
 import fcu.iecs.demo.repository.UserRepository;
 import fcu.iecs.demo.security.JwtTokenProvider;
 import fcu.iecs.demo.util.UserIdGenerator;
-import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -24,7 +21,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.Date;
@@ -196,6 +192,7 @@ public class AuthService {
       return new JwtAuthenticationResponse(
           jwt,
           "Bearer",
+          user.getUserId(),
           user.getUsername(),
           user.getEmail(),
           user.getPhone()
@@ -227,6 +224,7 @@ public class AuthService {
       return new JwtAuthenticationResponse(
           jwt,
           "Bearer",
+          user.getUserId(),
           user.getUsername(),
           user.getEmail(),
           user.getPhone());
