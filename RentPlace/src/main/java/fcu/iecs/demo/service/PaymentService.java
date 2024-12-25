@@ -42,4 +42,20 @@ public class PaymentService {
     Payment payment = getPaymentById(paymentId);
     paymentRepository.delete(payment);
   }
+  public String generateVirtualAccount() {
+    // 生成隨機虛擬帳號，例如 12 位數字
+    String virtualAccount = String.valueOf((long) (Math.random() * 1_000_000_000_000L));
+
+    // 將虛擬帳號儲存到資料庫
+    Payment payment = new Payment();
+    payment.setPaymentMethod(PaymentMethod.BANK_TRANSFER);
+    payment.setPaymentDate(LocalDateTime.now());
+    payment.setVirtualAccount(virtualAccount); // 確保此處正確設置值
+    // 如果需要，將虛擬帳號與用戶或訂單關聯
+    // payment.setUserId(userId); // 假設有 userId
+    // payment.setOrderId(orderId); // 假設有 orderId
+    paymentRepository.save(payment);
+    System.out.println("Generated Virtual Account: " + virtualAccount);
+    return virtualAccount;
+  }
 }
