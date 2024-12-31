@@ -19,7 +19,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Intege
     @Query("SELECT r FROM Reservation r JOIN FETCH r.timePeriod JOIN FETCH r.timePeriod_statusInfo")
     List<Reservation> findAllWithTimePeriodAndStatus();
 
-    @Query("SELECT r FROM Reservation r JOIN FETCH r.timePeriod JOIN FETCH r.timePeriod_statusInfo WHERE r.id = :id")
+    @Query("SELECT r FROM Reservation r JOIN FETCH r.timePeriod JOIN FETCH r.timePeriod_statusInfo WHERE r.reservationId = :id")
     Optional<Reservation> findByIdWithTimePeriodAndStatus(@Param("id") Integer id);
 
     @Query("SELECT r FROM Reservation r JOIN FETCH r.venue JOIN FETCH r.timePeriod_statusInfo WHERE r.venue.id = :venueId")

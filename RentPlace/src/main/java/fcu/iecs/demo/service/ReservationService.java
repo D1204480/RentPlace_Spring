@@ -95,9 +95,10 @@ public class ReservationService {
   @Transactional(readOnly = true)
   public Optional<Reservation> getReservationById(Integer id) {
     log.info("Getting reservation by id: {}", id);
-    Optional<Reservation> reservation = reservationRepository.findByIdWithTimePeriodAndStatus(id);
+//    Optional<Reservation> reservation = reservationRepository.findByIdWithTimePeriodAndStatus(id);
+    Optional<Reservation> reservation = reservationRepository.findById(id);
     // 如果找到預約，預處理設備分類資訊
-    reservation.ifPresent(r -> r.getEquipmentCategories());
+    reservation.ifPresent(Reservation::getEquipmentCategories);
     return reservation;
   }
 
@@ -154,6 +155,7 @@ public class ReservationService {
     Payment payment = new Payment();
     payment.setPaymentMethod(reservation.getPaymentMethod());
     payment.setPaymentDate(LocalDateTime.now());
+    payment.setVirtualAccount(reservation.getVirtualAccount()); // 增加設定虛擬帳號
     Payment savedPayment = paymentRepository.save(payment);
 
     // 4. 創建訂單
