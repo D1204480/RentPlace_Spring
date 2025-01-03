@@ -39,3 +39,5 @@ build/
 
 ## database connection
 **application-dev.properties
+
+RentPlace/src/main/resources/serviceAccountKey.json
