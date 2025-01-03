@@ -155,7 +155,12 @@ public class ReservationService {
     Payment payment = new Payment();
     payment.setPaymentMethod(reservation.getPaymentMethod());
     payment.setPaymentDate(LocalDateTime.now());
-    payment.setVirtualAccount(reservation.getVirtualAccount()); // 增加設定虛擬帳號
+    // 只有在非線上支付且虛擬帳號不為空時才設定
+    if (!"ONLINE_PAYMENT".equals(reservation.getPaymentMethod()) &&
+        reservation.getVirtualAccount() != null &&
+        !reservation.getVirtualAccount().trim().isEmpty()) {
+      payment.setVirtualAccount(reservation.getVirtualAccount());
+    }
     Payment savedPayment = paymentRepository.save(payment);
 
     // 4. 創建訂單
