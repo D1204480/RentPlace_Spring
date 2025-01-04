@@ -55,6 +55,12 @@ public class AuthController {
       JwtAuthenticationResponse response = authService.login(loginRequest);
       return ResponseEntity.ok(response);
 
+    } catch (UsernameNotFoundException e) {
+      log.warn("Login failed - user not found: {}", loginRequest.getEmail());
+      return ResponseEntity
+          .status(HttpStatus.NOT_FOUND)
+          .body(new MessageResponse(e.getMessage()));
+
     } catch (BadCredentialsException e) {
       log.warn("Login failed - bad credentials: {}", loginRequest.getEmail());
       return ResponseEntity
