@@ -172,8 +172,9 @@ public class AuthService {
       User user = userRepository.findByEmail(loginRequest.getEmail())
           .orElseThrow(() -> new UsernameNotFoundException("此 Email 尚未註冊"));
 
-      // 2. 檢查用戶狀態 (13表示用戶註銷帳戶)
-      if (user.getStatusId() == 13) {
+      // 2. 檢查用戶狀態 - 處理 null 的情況
+      Integer statusId = user.getStatusId();
+      if (statusId != null && statusId == 13) {
         logger.warn("User account not found: {}", loginRequest.getEmail());
         throw new UsernameNotFoundException("查無使用者");
       }
