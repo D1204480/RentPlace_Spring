@@ -16,11 +16,11 @@ public class CloseDate {
     @Column(name = "close_date")
     private LocalDate closeDate;
 
-//    @Column(name = "venue_id")
-//    private Integer venueId;
-//
-//    @Column(name = "status_id")
-//    private Integer statusId;
+    @Column(name = "venue_id")
+    private Integer venueId;
+
+    @Column(name = "status_id")
+    private Integer statusId;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "venue_id", referencedColumnName = "venue_id", insertable = false, updatable = false)
@@ -47,21 +47,21 @@ public class CloseDate {
         this.closeDate = closeDate;
     }
 
-//    public Integer getVenueId() {
-//        return venueId;
-//    }
-//
-//    public void setVenueId(Integer venueId) {
-//        this.venueId = venueId;
-//    }
-//
-//    public Integer getStatusId() {
-//        return statusId;
-//    }
-//
-//    public void setStatusId(Integer statusId) {
-//        this.statusId = statusId;
-//    }
+    public Integer getVenueId() {
+        return venueId;
+    }
+
+    public void setVenueId(Integer venueId) {
+        this.venueId = venueId;
+    }
+
+    public Integer getStatusId() {
+        return statusId;
+    }
+
+    public void setStatusId(Integer statusId) {
+        this.statusId = statusId;
+    }
 
     public Venue getVenue() {
         return venue;

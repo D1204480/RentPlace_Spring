@@ -52,6 +52,10 @@ public class Venue {
     @Column(name = "image_id")
     private Integer imageId;
 
+    @OneToOne
+    @JoinColumn(name = "image_id", referencedColumnName = "image_id", insertable = false, updatable = false)
+    private Image imageName;
+
     @Column(name = "phone_number")
     private String phoneNumber;
 
@@ -62,4 +66,10 @@ public class Venue {
     @OneToMany(mappedBy = "venue")
     @JsonIgnoreProperties({"venue"})
     private List<CloseDate> closeDates;
+
+    
+    // 新增 getter
+    public String getImageName() {
+        return imageName != null ? imageName.getImageName() : null;
+    }
 }

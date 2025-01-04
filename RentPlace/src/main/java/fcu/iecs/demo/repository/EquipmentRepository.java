@@ -12,5 +12,7 @@ public interface EquipmentRepository extends JpaRepository<Equipment, Integer> {
     // You can define custom query methods here if needed
     @Query("SELECT e FROM Equipment e JOIN FETCH e.venue v WHERE v.id = :venueId")
     List<Equipment> findAllByVenueId(@Param("venueId") Integer venueId);
+
+    void deleteByVenueId(Integer venueId);
 }
 

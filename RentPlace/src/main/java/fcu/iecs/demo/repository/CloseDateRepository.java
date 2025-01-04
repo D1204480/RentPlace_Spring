@@ -18,4 +18,6 @@ public interface CloseDateRepository extends JpaRepository<CloseDate, Integer> {
 
   List<CloseDate> findByVenueId(Integer venueId);
 
+  void deleteByVenueId(Integer venueId);
+
 }
