@@ -151,89 +151,68 @@ public class VenueService {
   }
 
   public Venue updateVenue(Integer id, VenueDTO venueDTO) {
-    // 檢查 venue 是否存在
     Venue venue = venueRepository.findById(id)
         .orElseThrow(() -> new VenueNotFoundException(id));
 
     // 處理 Image
     if (venueDTO.getImageName() != null && !venueDTO.getImageName().trim().isEmpty()) {
-      // 如果原本有圖片，可以選擇刪除
-      if (venue.getImageId() != null) {
-        imageRepository.deleteById(venue.getImageId());
-      }
-
       // 建立新圖片
       Image image = new Image();
       image.setImageName(venueDTO.getImageName());
       image.setImagePath("/images/" + venueDTO.getImageName());
       image.setImageSize("default");
       image.setImageType("jpg");
-
       Image savedImage = imageRepository.save(image);
+
+      // 更新 venue 的 imageId
       venue.setImageId(savedImage.getImageId());
+    } else {
+      // 如果沒有新圖片，保持原有的 imageId
+      // venue.setImageId(null);  // 移除這行，不要設為 null
     }
 
-    // 更新 Venue 基本資料
+    // 更新其他欄位
     venue.setPlaceName(venueDTO.getPlaceName());
     venue.setVenueType(venueDTO.getVenueType());
     venue.setVenueName(venueDTO.getVenueName());
     venue.setRegionName(venueDTO.getRegionName());
     venue.setAddress(venueDTO.getAddress());
-    venue.setUnitPrice(Double.parseDouble(venueDTO.getUnitPrice())); // String 轉 Double
+    venue.setUnitPrice(Double.parseDouble(venueDTO.getUnitPrice()));
     venue.setUnit(venueDTO.getUnit());
     venue.setCapacity(venueDTO.getCapacity());
     venue.setAvailableTime(venueDTO.getAvailableTime());
     venue.setRemark(venueDTO.getRemark());
-    venue.setRemark(venueDTO.getRemark());
     venue.setPhoneNumber(venueDTO.getPhoneNumber());
 
-//    // 處理 imageId
-//    if (venueDTO.getImageId() != null && !venueDTO.getImageId().trim().isEmpty()) {
-//      try {
-//        Integer imageId = Integer.parseInt(venueDTO.getImageId());
-//        if (imageRepository.existsById(imageId)) {
-//          venue.setImageId(imageId);
-//        } else {
-//          throw new RuntimeException("Image not found with id: " + imageId);
-//        }
-//      } catch (NumberFormatException e) {
-//        venue.setImageId(null);
-//      }
-//    } else {
-//      venue.setImageId(null);
-//    }
-//    venue.setPhoneNumber(venueDTO.getPhoneNumber());
+    // 先儲存 venue
+    Venue savedVenue = venueRepository.save(venue);
 
-    // 刪除原有的 equipment
+    // 更新 equipment
     equipmentRepository.deleteByVenueId(id);
-
-    // 新增新的 equipment
     if (venueDTO.getEquipment() != null && venueDTO.getEquipment().length > 0) {
       Arrays.stream(venueDTO.getEquipment())
           .forEach(equipmentName -> {
             Equipment equipment = new Equipment();
             equipment.setEquipmentName(equipmentName);
-            equipment.setVenue(venue);
+            equipment.setVenue(savedVenue);
             equipmentRepository.save(equipment);
           });
     }
 
-    // 刪除原有的 closeDates
+    // 更新 closeDates
     closeDateRepository.deleteByVenueId(id);
-
-    // 新增新的 closeDates
     if (venueDTO.getCloseDates() != null && venueDTO.getCloseDates().length > 0) {
       Arrays.stream(venueDTO.getCloseDates())
           .forEach(date -> {
             CloseDate closeDate = new CloseDate();
             closeDate.setCloseDate(LocalDate.parse(date));
-            closeDate.setVenueId(venue.getId());  // 設定 venue_id
-            closeDate.setStatusId(12);  // 設定 status_id
+            closeDate.setVenueId(savedVenue.getId());
+            closeDate.setStatusId(12);
             closeDateRepository.save(closeDate);
           });
     }
 
-    return venueRepository.save(venue);
+    return savedVenue;
   }
 
   @Transactional

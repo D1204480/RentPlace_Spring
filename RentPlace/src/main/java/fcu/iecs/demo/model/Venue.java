@@ -67,7 +67,7 @@ public class Venue {
     @JsonIgnoreProperties({"venue"})
     private List<CloseDate> closeDates;
 
-    
+
     // 新增 getter
     public String getImageName() {
         return imageName != null ? imageName.getImageName() : null;
