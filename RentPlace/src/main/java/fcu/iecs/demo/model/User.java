@@ -10,9 +10,9 @@ import java.util.Date;
 
 @Data
 @Entity
-@Table(name = "Users_Table")
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(name = "Users_Table")
 public class User {
 
   @Id
@@ -41,5 +41,8 @@ public class User {
 
   @Column(name = "provider", nullable = false, length = 100)
   private String provider;  // GOOGLE, FACEBOOK 等
+
+  @Column(name = "status_id")
+  private Integer statusId;
 
 }

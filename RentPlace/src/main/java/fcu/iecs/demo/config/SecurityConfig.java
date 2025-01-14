@@ -91,8 +91,9 @@ public class SecurityConfig {
     CorsConfiguration configuration = new CorsConfiguration();
     // 允許的來源（這裡是本地開發環境）
 
-    configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173", "http://localhost:63342",
+    configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173", "http://localhost:5174","http://localhost:63342",
         "https://d1204480.github.io", "http://127.0.0.1:5500/"));
+
 
     // 允許的 HTTP 方法
     configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));

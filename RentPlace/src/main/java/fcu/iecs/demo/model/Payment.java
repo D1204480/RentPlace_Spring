@@ -18,6 +18,9 @@ public class Payment {
   @Column(name = "payment_date")
   private LocalDateTime paymentDate;
 
+  @Column(name = "virtual_account", unique = true, nullable = true, length = 20)
+  private String virtualAccount;
+
   // 回傳要給前端看的 payment_method 的顯示名稱
   public String getPaymentMethodDisplay() {
     return paymentMethod != null ? paymentMethod.getDisplayName() : "";
@@ -46,5 +49,13 @@ public class Payment {
 
   public void setPaymentDate(LocalDateTime paymentDate) {
     this.paymentDate = paymentDate;
+  }
+
+  public String getVirtualAccount() {
+    return virtualAccount;
+  }
+
+  public void setVirtualAccount(String virtualAccount) {
+    this.virtualAccount = virtualAccount;
   }
 }

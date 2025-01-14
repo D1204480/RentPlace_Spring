@@ -1,9 +1,11 @@
 package fcu.iecs.demo.controller;
 
+import fcu.iecs.demo.dto.response.ApiResponse;
 import fcu.iecs.demo.model.User;
 import fcu.iecs.demo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -47,9 +49,16 @@ public class UserController {
     return userService.updateUser(userId, userDetails);
   }
 
+
   @DeleteMapping("/{userId}")
   public void deleteUser(@PathVariable String userId) {
     userService.deleteUser(userId);
+  }
+
+  @DeleteMapping("/{userId}/soft")
+  public ResponseEntity<ApiResponse> softDeleteUser(@PathVariable String userId) {
+    userService.softDeleteUser(userId);
+    return ResponseEntity.ok(new ApiResponse("用戶已刪除", true));
   }
 }
 

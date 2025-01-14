@@ -5,6 +5,7 @@ import fcu.iecs.demo.model.PaymentMethod;
 import fcu.iecs.demo.service.PaymentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -54,4 +55,12 @@ public class PaymentController {
     paymentService.deletePayment(id);
     return ResponseEntity.ok().build();
   }
+  @GetMapping("/virtual-account")
+  public ResponseEntity<String> getVirtualAccount() {
+    String virtualAccount = paymentService.generateVirtualAccount();
+    // 設置返回的 Content-Type 為 text/plain
+    return ResponseEntity.ok().contentType(MediaType.TEXT_PLAIN).body(virtualAccount);
+  }
+
+
 }

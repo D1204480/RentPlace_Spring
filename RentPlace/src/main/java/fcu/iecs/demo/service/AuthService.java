@@ -172,9 +172,16 @@ public class AuthService {
       User user = userRepository.findByEmail(loginRequest.getEmail())
           .orElseThrow(() -> new UsernameNotFoundException("此 Email 尚未註冊"));
 
+      // 2. 檢查用戶狀態 - 處理 null 的情況
+      Integer statusId = user.getStatusId();
+      if (statusId != null && statusId == 13) {
+        logger.warn("User account not found: {}", loginRequest.getEmail());
+        throw new UsernameNotFoundException("查無使用者");
+      }
+
       logger.debug("Found user with email: {}", user.getEmail());
 
-      // 2. 檢查密碼
+      // 3. 檢查密碼
       if (user.getPassword() == null) {
         throw new BadCredentialsException("此帳號使用第三方登入，請使用相應的登入方式");
       }
@@ -183,12 +190,12 @@ public class AuthService {
         throw new BadCredentialsException("Email 或密碼錯誤");
       }
 
-      // 3. 生成 JWT
+      // 4. 生成 JWT
       String jwt = jwtTokenProvider.generateToken(user);
 
       logger.info("Login successful for email: {}", loginRequest.getEmail());
 
-      // 4. 返回響應
+      // 5. 返回響應
       return new JwtAuthenticationResponse(
           jwt,
           "Bearer",

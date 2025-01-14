@@ -61,7 +61,7 @@ public class UserService {
   public List<User> getAllUsers() {
     List<User> users = userRepository.findAll();
     System.out.println("Fetched Users: " + users);
-    return users;
+    return userRepository.findByStatusIdNot(13);   // 只返回非刪除狀態的用戶
   }
 
 
@@ -95,5 +95,13 @@ public class UserService {
 
   public void deleteUser(String userId) {
     userRepository.deleteById(userId);
+  }
+
+  public void softDeleteUser(String userId) {
+    User user = getUserById(userId)
+        .orElseThrow(() -> new RuntimeException("User not found"));
+    user.setStatusId(13);  // 13 表示用戶註銷狀態
+    userRepository.save(user);
+    System.out.println("用戶註銷成功: " + userId);
   }
 }

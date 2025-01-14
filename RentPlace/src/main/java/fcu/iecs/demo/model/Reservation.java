@@ -302,5 +302,15 @@ public class Reservation {
     return Arrays.asList("飲水機","電梯", "停車場", "無障礙設施").contains(name);
   }
 
+  @Transient  // 不會儲存到資料庫
+  private String virtualAccount;
+
+  public String getVirtualAccount() {
+    return virtualAccount;
+  }
+
+  public void setVirtualAccount(String virtualAccount) {
+    this.virtualAccount = virtualAccount;
+  }
 
 }
