@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 
 import java.io.ByteArrayInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -47,44 +48,40 @@ public class FirebaseConfig {
   @PostConstruct
   public void initialize() {
     try {
-      log.info("Current active profile: {}", activeProfile); // 添加日誌來檢查當前配置
+      log.info("Current active profile: {}", activeProfile);
 
-      if (isDevelopment()) {
-        log.info("Development mode: Using local Firebase credentials file");
-        initWithLocalFile();
-      } else if (StringUtils.isNotEmpty(firebaseCredentials)) {
-        log.info("Production mode: Using Firebase credentials from environment variable");
+      if (StringUtils.isNotEmpty(firebaseCredentials)) {
+        log.info("Using environment variable configuration");
         initWithEnvCredentials();
       } else {
-        throw new IllegalStateException("Firebase configuration is missing. Either set FIREBASE_CREDENTIALS environment variable or use dev profile with local config file.");
+        log.info("Trying to use local configuration file");
+        initWithLocalFile();
       }
     } catch (Exception e) {
-      log.error("Firebase initialization failed: {}", e.getMessage(), e);
-      throw new RuntimeException("Firebase initialization failed", e);
+      String errorMessage = "Firebase configuration is missing. Please either:\n" +
+          "1. Set FIREBASE_CREDENTIALS environment variable, or\n" +
+          "2. Place serviceAccountKey.json in src/main/resources/";
+      log.error(errorMessage, e);
+      throw new IllegalStateException(errorMessage, e);
     }
   }
 
-  private boolean isDevelopment() {
-    return "dev".equals(activeProfile) ||
-        "local".equals(activeProfile) ||
-        StringUtils.isEmpty(activeProfile);
+  private void initWithLocalFile() throws IOException {
+    ClassPathResource resource = new ClassPathResource("serviceAccountKey.json");
+    if (!resource.exists()) {
+      throw new FileNotFoundException("serviceAccountKey.json not found in resources directory");
+    }
+    initializeFirebase(resource.getInputStream());
   }
 
   private void initWithEnvCredentials() throws IOException {
+    if (StringUtils.isEmpty(firebaseCredentials)) {
+      throw new IllegalStateException("FIREBASE_CREDENTIALS environment variable is empty");
+    }
     InputStream serviceAccount = new ByteArrayInputStream(
         firebaseCredentials.getBytes(StandardCharsets.UTF_8)
     );
     initializeFirebase(serviceAccount);
-  }
-
-  private void initWithLocalFile() throws IOException {
-    try {
-      ClassPathResource resource = new ClassPathResource("serviceAccountKey.json");
-      initializeFirebase(resource.getInputStream());
-    } catch (IOException e) {
-      log.error("Local Firebase credentials file not found", e);
-      throw new IllegalStateException("Local Firebase credentials file (serviceAccountKey.json) is required for dev environment");
-    }
   }
 
   private void initializeFirebase(InputStream serviceAccount) throws IOException {
