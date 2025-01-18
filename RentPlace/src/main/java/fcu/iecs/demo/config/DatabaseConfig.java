@@ -1,48 +1,60 @@
 package fcu.iecs.demo.config;
 
-import com.google.api.client.util.Value;
 import com.zaxxer.hikari.HikariDataSource;
-import org.springframework.boot.context.properties.ConfigurationProperties;
+import jakarta.persistence.EntityManagerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.orm.jpa.JpaTransactionManager;
+import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
+import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
+import org.springframework.transaction.PlatformTransactionManager;
 
 import javax.sql.DataSource;
+import java.util.HashMap;
+import java.util.Map;
 
 @Configuration
-@ConfigurationProperties(prefix = "spring.datasource")
 public class DatabaseConfig {
-
-  @Value("${MYSQL_URL}")  // 直接使用環境變量
-  private String jdbcUrl;
-
-  @Value("${MYSQLUSER}")
-  private String username;
-
-  @Value("${MYSQLPASSWORD}")
-  private String password;
 
   @Bean
   public DataSource dataSource() {
-    HikariDataSource ds = new HikariDataSource();
+    HikariDataSource dataSource = new HikariDataSource();
 
-    // 確保 URL 是正確的 JDBC 格式
-    if (!jdbcUrl.startsWith("jdbc:")) {
-      jdbcUrl = "jdbc:" + jdbcUrl;
-    }
+    // 使用環境變量
+    dataSource.setJdbcUrl(System.getenv("MYSQL_URL"));
+    dataSource.setUsername(System.getenv("MYSQLUSER"));
+    dataSource.setPassword(System.getenv("MYSQLPASSWORD"));
+    dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
 
-    ds.setJdbcUrl(jdbcUrl);
-    ds.setUsername(username);
-    ds.setPassword(password);
-    ds.setDriverClassName("com.mysql.cj.jdbc.Driver");
+    // 設置連接池屬性
+    dataSource.setMaximumPoolSize(5);
+    dataSource.setMinimumIdle(2);
+    dataSource.setConnectionTimeout(30000);
 
-    // 額外的連接屬性
-    ds.addDataSourceProperty("allowPublicKeyRetrieval", "true");
-    ds.addDataSourceProperty("useSSL", "false");
-    ds.setMaximumPoolSize(5);
-    ds.setConnectionTimeout(30000);
+    return dataSource;
+  }
 
-    System.out.println("Database URL: " + jdbcUrl); // 用於調試
+  @Bean
+  public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
+    LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
+    em.setDataSource(dataSource());
+    em.setPackagesToScan("fcu.iecs.demo.model");
 
-    return ds;
+    HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
+    em.setJpaVendorAdapter(vendorAdapter);
+
+    Map<String, Object> properties = new HashMap<>();
+    properties.put("hibernate.hbm2ddl.auto", "update");
+    properties.put("hibernate.dialect", "org.hibernate.dialect.MySQL8Dialect");
+    em.setJpaPropertyMap(properties);
+
+    return em;
+  }
+
+  @Bean
+  public PlatformTransactionManager transactionManager(EntityManagerFactory emf) {
+    JpaTransactionManager transactionManager = new JpaTransactionManager();
+    transactionManager.setEntityManagerFactory(emf);
+    return transactionManager;
   }
 }
