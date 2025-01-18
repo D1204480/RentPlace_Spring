@@ -37,28 +37,34 @@ public class DatabaseConfig {
     dataSource.setPassword(password);
     dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
 
-    // 連接池設定
+    // 基本設定
     dataSource.setMaximumPoolSize(5);
     dataSource.setMinimumIdle(2);
-    dataSource.setConnectionTimeout(30000);
+    dataSource.setIdleTimeout(300000);
+    dataSource.setConnectionTimeout(20000);
     dataSource.setValidationTimeout(5000);
 
-    // 測試連接
+    // 連接測試
     dataSource.setConnectionTestQuery("SELECT 1");
 
-    // 添加額外的連接屬性
+    // 重要：設置重試
+    dataSource.setInitializationFailTimeout(30000);
+
+    // 額外的連接屬性
     dataSource.addDataSourceProperty("allowPublicKeyRetrieval", "true");
     dataSource.addDataSourceProperty("useSSL", "false");
     dataSource.addDataSourceProperty("serverTimezone", "UTC");
+    dataSource.addDataSourceProperty("connectTimeout", "20000");
+    dataSource.addDataSourceProperty("socketTimeout", "30000");
 
     return dataSource;
   }
 
   @Bean
-  public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
+  public LocalContainerEntityManagerFactoryBean entityManagerFactory(DataSource dataSource) {
     LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
-    em.setDataSource(dataSource());
-    em.setPackagesToScan("fcu.iecs.demo.model");
+    em.setDataSource(dataSource);
+    em.setPackagesToScan("fcu.iecs.demo.model");  // 你的實體類包名
 
     HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
     vendorAdapter.setGenerateDdl(true);
@@ -66,11 +72,17 @@ public class DatabaseConfig {
     em.setJpaVendorAdapter(vendorAdapter);
 
     Map<String, Object> properties = new HashMap<>();
-    properties.put("hibernate.hbm2ddl.auto", "update");
     properties.put("hibernate.dialect", "org.hibernate.dialect.MySQL8Dialect");
-    properties.put("hibernate.globally_quoted_identifiers", "true");
+    properties.put("hibernate.hbm2ddl.auto", "update");
+    properties.put("hibernate.show_sql", "true");
+    properties.put("hibernate.format_sql", "true");
     em.setJpaPropertyMap(properties);
 
     return em;
+  }
+
+  @Bean
+  public PlatformTransactionManager transactionManager(EntityManagerFactory emf) {
+    return new JpaTransactionManager(emf);
   }
 }
