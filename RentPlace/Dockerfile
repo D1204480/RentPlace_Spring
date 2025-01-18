@@ -1,14 +1,9 @@
-# 使用 Java 17 作為基礎映像
-FROM openjdk:17-jdk-slim
-
-# 設定工作目錄
+FROM maven:3.8.4-openjdk-17 AS build
 WORKDIR /app
+COPY . .
+RUN mvn clean package -DskipTests
 
-# 複製 Maven 構建出來的 JAR 檔案到容器中
-COPY target/*.jar app.jar
-
-# 設定容器對外開放的埠號
+FROM openjdk:17-jdk-slim
+COPY --from=build /app/target/*.jar app.jar
 EXPOSE 8080
-
-# 設定啟動指令
-ENTRYPOINT ["java","-jar","app.jar"]
+ENTRYPOINT ["java","-jar","/app.jar"]
