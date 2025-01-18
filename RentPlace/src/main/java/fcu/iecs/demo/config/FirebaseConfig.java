@@ -1,5 +1,7 @@
 package fcu.iecs.demo.config;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.api.client.util.Value;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;
@@ -15,6 +17,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 //@Configuration
 //public class FirebaseConfig {
@@ -53,7 +57,7 @@ public class FirebaseConfig {
       log.info("Firebase credentials length: {}",
           firebaseCredentials != null ? firebaseCredentials.length() : "null");
 
-      // 檢查 credentials 內容的前100個字符（避免洩露敏感信息）
+      // 檢查 credentials 內容的前100個字符
       if (!StringUtils.isEmpty(firebaseCredentials)) {
         log.info("Credentials preview: {}",
             firebaseCredentials.substring(0, Math.min(100, firebaseCredentials.length())));
@@ -76,12 +80,10 @@ public class FirebaseConfig {
     try {
       log.info("Starting initialization with environment credentials");
 
-      // 嘗試解析 JSON 來驗證格式
+      // 驗證 JSON 格式
       ObjectMapper mapper = new ObjectMapper();
       JsonNode jsonNode = mapper.readTree(firebaseCredentials);
-      log.info("JSON validation successful. Found fields: {}",
-          StreamSupport.stream(jsonNode.fieldNames().spliterator(), false)
-              .collect(Collectors.joining(", ")));
+      log.info("JSON validation successful. Contains service account info");
 
       InputStream serviceAccount = new ByteArrayInputStream(
           firebaseCredentials.getBytes(StandardCharsets.UTF_8)
