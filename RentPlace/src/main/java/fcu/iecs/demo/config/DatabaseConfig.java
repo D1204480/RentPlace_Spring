@@ -2,36 +2,47 @@ package fcu.iecs.demo.config;
 
 import com.google.api.client.util.Value;
 import com.zaxxer.hikari.HikariDataSource;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import javax.sql.DataSource;
 
 @Configuration
+@ConfigurationProperties(prefix = "spring.datasource")
 public class DatabaseConfig {
 
-  @Value("${spring.datasource.url}")
-  private String url;
+  @Value("${MYSQL_URL}")  // 直接使用環境變量
+  private String jdbcUrl;
 
-  @Value("${spring.datasource.username}")
+  @Value("${MYSQLUSER}")
   private String username;
 
-  @Value("${spring.datasource.password}")
+  @Value("${MYSQLPASSWORD}")
   private String password;
 
   @Bean
   public DataSource dataSource() {
-    HikariDataSource dataSource = new HikariDataSource();
-    // 改用 setJdbcUrl 而不是 setUrl
-    dataSource.setJdbcUrl(url);
-    dataSource.setUsername(username);
-    dataSource.setPassword(password);
-    dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
+    HikariDataSource ds = new HikariDataSource();
 
-    // 添加連接配置
-    dataSource.addDataSourceProperty("allowPublicKeyRetrieval", "true");
-    dataSource.addDataSourceProperty("useSSL", "false");
+    // 確保 URL 是正確的 JDBC 格式
+    if (!jdbcUrl.startsWith("jdbc:")) {
+      jdbcUrl = "jdbc:" + jdbcUrl;
+    }
 
-    return dataSource;
+    ds.setJdbcUrl(jdbcUrl);
+    ds.setUsername(username);
+    ds.setPassword(password);
+    ds.setDriverClassName("com.mysql.cj.jdbc.Driver");
+
+    // 額外的連接屬性
+    ds.addDataSourceProperty("allowPublicKeyRetrieval", "true");
+    ds.addDataSourceProperty("useSSL", "false");
+    ds.setMaximumPoolSize(5);
+    ds.setConnectionTimeout(30000);
+
+    System.out.println("Database URL: " + jdbcUrl); // 用於調試
+
+    return ds;
   }
 }
