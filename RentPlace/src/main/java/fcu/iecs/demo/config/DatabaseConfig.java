@@ -22,18 +22,15 @@ public class DatabaseConfig {
   @Bean
   public DataSource dataSource() {
     HikariDataSource dataSource = new HikariDataSource();
+    // 改用 setJdbcUrl 而不是 setUrl
     dataSource.setJdbcUrl(url);
     dataSource.setUsername(username);
     dataSource.setPassword(password);
     dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
-    dataSource.setMaximumPoolSize(10);
-    dataSource.setMinimumIdle(5);
-    dataSource.setConnectionTimeout(30000);
 
-    // 添加額外的連接屬性
-    dataSource.addDataSourceProperty("useSSL", "false");
+    // 添加連接配置
     dataSource.addDataSourceProperty("allowPublicKeyRetrieval", "true");
-    dataSource.addDataSourceProperty("serverTimezone", "UTC");
+    dataSource.addDataSourceProperty("useSSL", "false");
 
     return dataSource;
   }
