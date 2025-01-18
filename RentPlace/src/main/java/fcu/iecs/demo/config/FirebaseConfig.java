@@ -42,67 +42,75 @@ public class FirebaseConfig {
   @Value("${FIREBASE_CREDENTIALS:}")
   private String firebaseCredentials;
 
-  @Value("${spring.profiles.active:prod}")  // 默認使用 prod profile
+  @Value("${spring.profiles.active:prod}")
   private String activeProfile;
 
   @PostConstruct
   public void initialize() {
     try {
+      log.info("Starting Firebase initialization...");
       log.info("Active profile: {}", activeProfile);
-      log.info("Firebase credentials exists: {}", !StringUtils.isEmpty(firebaseCredentials));
+      log.info("Firebase credentials length: {}",
+          firebaseCredentials != null ? firebaseCredentials.length() : "null");
+
+      // 檢查 credentials 內容的前100個字符（避免洩露敏感信息）
+      if (!StringUtils.isEmpty(firebaseCredentials)) {
+        log.info("Credentials preview: {}",
+            firebaseCredentials.substring(0, Math.min(100, firebaseCredentials.length())));
+      }
 
       if (!StringUtils.isEmpty(firebaseCredentials)) {
-        log.info("Initializing Firebase with credentials from environment variable");
+        log.info("Using environment credentials");
         initWithEnvCredentials();
-      } else if ("dev".equals(activeProfile) || "local".equals(activeProfile)) {
-        log.info("Development environment detected, using local file");
-        initWithLocalFile();
       } else {
-        String errorMessage = "Firebase credentials not found in environment variables";
-        log.error(errorMessage);
-        throw new IllegalStateException(errorMessage);
+        log.error("Firebase credentials not found");
+        throw new IllegalStateException("Firebase credentials not found");
       }
     } catch (Exception e) {
-      log.error("Firebase initialization failed", e);
-      throw new RuntimeException("Firebase initialization failed", e);
+      log.error("Firebase initialization error: ", e);
+      throw new RuntimeException("Firebase initialization failed: " + e.getMessage(), e);
     }
   }
 
   private void initWithEnvCredentials() throws IOException {
     try {
-      log.info("Starting Firebase initialization with env credentials");
+      log.info("Starting initialization with environment credentials");
+
+      // 嘗試解析 JSON 來驗證格式
+      ObjectMapper mapper = new ObjectMapper();
+      JsonNode jsonNode = mapper.readTree(firebaseCredentials);
+      log.info("JSON validation successful. Found fields: {}",
+          StreamSupport.stream(jsonNode.fieldNames().spliterator(), false)
+              .collect(Collectors.joining(", ")));
+
       InputStream serviceAccount = new ByteArrayInputStream(
           firebaseCredentials.getBytes(StandardCharsets.UTF_8)
       );
       initializeFirebase(serviceAccount);
-      log.info("Firebase successfully initialized with env credentials");
+      log.info("Environment credentials initialization complete");
     } catch (Exception e) {
-      log.error("Error initializing Firebase with env credentials: {}", e.getMessage());
-      throw e;
+      log.error("Error in initWithEnvCredentials: ", e);
+      throw new IOException("Failed to initialize with environment credentials: " + e.getMessage(), e);
     }
-  }
-
-  private void initWithLocalFile() throws IOException {
-    ClassPathResource resource = new ClassPathResource("serviceAccountKey.json");
-    if (!resource.exists()) {
-      throw new FileNotFoundException("serviceAccountKey.json not found in resources directory");
-    }
-    initializeFirebase(resource.getInputStream());
   }
 
   private void initializeFirebase(InputStream serviceAccount) throws IOException {
     try {
+      log.info("Creating Firebase options");
       FirebaseOptions options = FirebaseOptions.builder()
           .setCredentials(GoogleCredentials.fromStream(serviceAccount))
           .build();
 
       if (FirebaseApp.getApps().isEmpty()) {
+        log.info("Initializing new Firebase App");
         FirebaseApp.initializeApp(options);
-        log.info("Firebase App has been initialized successfully");
+        log.info("Firebase App initialization successful");
+      } else {
+        log.info("Firebase App already initialized");
       }
-    } catch (IOException e) {
-      log.error("Error in initializeFirebase: {}", e.getMessage());
-      throw e;
+    } catch (Exception e) {
+      log.error("Error in initializeFirebase: ", e);
+      throw new IOException("Failed to initialize Firebase: " + e.getMessage(), e);
     }
   }
 }
