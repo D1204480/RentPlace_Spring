@@ -36,35 +36,55 @@ import java.nio.charset.StandardCharsets;
 //}
 
 @Configuration
-@Slf4j  // 如果有使用 Lombok
+@Slf4j
 public class FirebaseConfig {
-  @Value("${FIREBASE_CREDENTIALS}")
+  @Value("${FIREBASE_CREDENTIALS:}")
   private String firebaseCredentials;
+
+  @Value("${spring.profiles.active:}")
+  private String activeProfile;
 
   @PostConstruct
   public void initialize() {
     try {
-      if (StringUtils.isNotEmpty(firebaseCredentials)) {
-        log.info("Initializing Firebase with credentials from environment variable");
-        initializeWithEnvCredentials();
+      log.info("Current active profile: {}", activeProfile); // 添加日誌來檢查當前配置
+
+      if (isDevelopment()) {
+        log.info("Development mode: Using local Firebase credentials file");
+        initWithLocalFile();
+      } else if (StringUtils.isNotEmpty(firebaseCredentials)) {
+        log.info("Production mode: Using Firebase credentials from environment variable");
+        initWithEnvCredentials();
       } else {
-        log.info("Initializing Firebase with local credentials file");
-        initializeWithLocalFile();
+        throw new IllegalStateException("Firebase configuration is missing. Either set FIREBASE_CREDENTIALS environment variable or use dev profile with local config file.");
       }
-    } catch (IOException e) {
-      log.error("Failed to initialize Firebase: {}", e.getMessage(), e);
+    } catch (Exception e) {
+      log.error("Firebase initialization failed: {}", e.getMessage(), e);
       throw new RuntimeException("Firebase initialization failed", e);
     }
   }
 
-  private void initializeWithEnvCredentials() throws IOException {
-    InputStream serviceAccount = new ByteArrayInputStream(firebaseCredentials.getBytes(StandardCharsets.UTF_8));
+  private boolean isDevelopment() {
+    return "dev".equals(activeProfile) ||
+        "local".equals(activeProfile) ||
+        StringUtils.isEmpty(activeProfile);
+  }
+
+  private void initWithEnvCredentials() throws IOException {
+    InputStream serviceAccount = new ByteArrayInputStream(
+        firebaseCredentials.getBytes(StandardCharsets.UTF_8)
+    );
     initializeFirebase(serviceAccount);
   }
 
-  private void initializeWithLocalFile() throws IOException {
-    ClassPathResource resource = new ClassPathResource("serviceAccountKey.json");
-    initializeFirebase(resource.getInputStream());
+  private void initWithLocalFile() throws IOException {
+    try {
+      ClassPathResource resource = new ClassPathResource("serviceAccountKey.json");
+      initializeFirebase(resource.getInputStream());
+    } catch (IOException e) {
+      log.error("Local Firebase credentials file not found", e);
+      throw new IllegalStateException("Local Firebase credentials file (serviceAccountKey.json) is required for dev environment");
+    }
   }
 
   private void initializeFirebase(InputStream serviceAccount) throws IOException {
@@ -74,7 +94,7 @@ public class FirebaseConfig {
 
     if (FirebaseApp.getApps().isEmpty()) {
       FirebaseApp.initializeApp(options);
-      log.info("Firebase has been initialized successfully");
+      log.info("Firebase initialized successfully");
     }
   }
 }
