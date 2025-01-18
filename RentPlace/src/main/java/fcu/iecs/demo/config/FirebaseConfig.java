@@ -6,12 +6,14 @@ import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import io.micrometer.common.util.StringUtils;
 import jakarta.annotation.PostConstruct;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
 //@Configuration
 //public class FirebaseConfig {
@@ -34,32 +36,45 @@ import java.io.InputStream;
 //}
 
 @Configuration
+@Slf4j  // 如果有使用 Lombok
 public class FirebaseConfig {
   @Value("${FIREBASE_CREDENTIALS}")
   private String firebaseCredentials;
 
   @PostConstruct
-  public void initialize() throws IOException {
-    if (StringUtils.isNotEmpty(firebaseCredentials)) {
-      // 從環境變量讀取憑證
-      InputStream serviceAccount = new ByteArrayInputStream(firebaseCredentials.getBytes());
-      FirebaseOptions options = FirebaseOptions.builder()
-          .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-          .build();
-
-      if (FirebaseApp.getApps().isEmpty()) {
-        FirebaseApp.initializeApp(options);
+  public void initialize() {
+    try {
+      if (StringUtils.isNotEmpty(firebaseCredentials)) {
+        log.info("Initializing Firebase with credentials from environment variable");
+        initializeWithEnvCredentials();
+      } else {
+        log.info("Initializing Firebase with local credentials file");
+        initializeWithLocalFile();
       }
-    } else {
-      // 本地開發環境從文件讀取
-      ClassPathResource resource = new ClassPathResource("serviceAccountKey.json");
-      FirebaseOptions options = FirebaseOptions.builder()
-          .setCredentials(GoogleCredentials.fromStream(resource.getInputStream()))
-          .build();
+    } catch (IOException e) {
+      log.error("Failed to initialize Firebase: {}", e.getMessage(), e);
+      throw new RuntimeException("Firebase initialization failed", e);
+    }
+  }
 
-      if (FirebaseApp.getApps().isEmpty()) {
-        FirebaseApp.initializeApp(options);
-      }
+  private void initializeWithEnvCredentials() throws IOException {
+    InputStream serviceAccount = new ByteArrayInputStream(firebaseCredentials.getBytes(StandardCharsets.UTF_8));
+    initializeFirebase(serviceAccount);
+  }
+
+  private void initializeWithLocalFile() throws IOException {
+    ClassPathResource resource = new ClassPathResource("serviceAccountKey.json");
+    initializeFirebase(resource.getInputStream());
+  }
+
+  private void initializeFirebase(InputStream serviceAccount) throws IOException {
+    FirebaseOptions options = FirebaseOptions.builder()
+        .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+        .build();
+
+    if (FirebaseApp.getApps().isEmpty()) {
+      FirebaseApp.initializeApp(options);
+      log.info("Firebase has been initialized successfully");
     }
   }
 }
