@@ -42,27 +42,43 @@ public class FirebaseConfig {
   @Value("${FIREBASE_CREDENTIALS:}")
   private String firebaseCredentials;
 
-  @Value("${spring.profiles.active:}")
+  @Value("${spring.profiles.active:prod}")  // 默認使用 prod profile
   private String activeProfile;
 
   @PostConstruct
   public void initialize() {
     try {
-      log.info("Current active profile: {}", activeProfile);
+      log.info("Active profile: {}", activeProfile);
+      log.info("Firebase credentials exists: {}", !StringUtils.isEmpty(firebaseCredentials));
 
-      if (StringUtils.isNotEmpty(firebaseCredentials)) {
-        log.info("Using environment variable configuration");
+      if (!StringUtils.isEmpty(firebaseCredentials)) {
+        log.info("Initializing Firebase with credentials from environment variable");
         initWithEnvCredentials();
-      } else {
-        log.info("Trying to use local configuration file");
+      } else if ("dev".equals(activeProfile) || "local".equals(activeProfile)) {
+        log.info("Development environment detected, using local file");
         initWithLocalFile();
+      } else {
+        String errorMessage = "Firebase credentials not found in environment variables";
+        log.error(errorMessage);
+        throw new IllegalStateException(errorMessage);
       }
     } catch (Exception e) {
-      String errorMessage = "Firebase configuration is missing. Please either:\n" +
-          "1. Set FIREBASE_CREDENTIALS environment variable, or\n" +
-          "2. Place serviceAccountKey.json in src/main/resources/";
-      log.error(errorMessage, e);
-      throw new IllegalStateException(errorMessage, e);
+      log.error("Firebase initialization failed", e);
+      throw new RuntimeException("Firebase initialization failed", e);
+    }
+  }
+
+  private void initWithEnvCredentials() throws IOException {
+    try {
+      log.info("Starting Firebase initialization with env credentials");
+      InputStream serviceAccount = new ByteArrayInputStream(
+          firebaseCredentials.getBytes(StandardCharsets.UTF_8)
+      );
+      initializeFirebase(serviceAccount);
+      log.info("Firebase successfully initialized with env credentials");
+    } catch (Exception e) {
+      log.error("Error initializing Firebase with env credentials: {}", e.getMessage());
+      throw e;
     }
   }
 
@@ -74,24 +90,19 @@ public class FirebaseConfig {
     initializeFirebase(resource.getInputStream());
   }
 
-  private void initWithEnvCredentials() throws IOException {
-    if (StringUtils.isEmpty(firebaseCredentials)) {
-      throw new IllegalStateException("FIREBASE_CREDENTIALS environment variable is empty");
-    }
-    InputStream serviceAccount = new ByteArrayInputStream(
-        firebaseCredentials.getBytes(StandardCharsets.UTF_8)
-    );
-    initializeFirebase(serviceAccount);
-  }
-
   private void initializeFirebase(InputStream serviceAccount) throws IOException {
-    FirebaseOptions options = FirebaseOptions.builder()
-        .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-        .build();
+    try {
+      FirebaseOptions options = FirebaseOptions.builder()
+          .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+          .build();
 
-    if (FirebaseApp.getApps().isEmpty()) {
-      FirebaseApp.initializeApp(options);
-      log.info("Firebase initialized successfully");
+      if (FirebaseApp.getApps().isEmpty()) {
+        FirebaseApp.initializeApp(options);
+        log.info("Firebase App has been initialized successfully");
+      }
+    } catch (IOException e) {
+      log.error("Error in initializeFirebase: {}", e.getMessage());
+      throw e;
     }
   }
 }
