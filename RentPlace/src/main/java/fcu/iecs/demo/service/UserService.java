@@ -58,10 +58,8 @@ public class UserService {
     }
   }
 
-  public List<User> getAllUsers() {
-    List<User> users = userRepository.findAll();
-    System.out.println("Fetched Users: " + users);
-    return userRepository.findByStatusIdNot(13);   // 只返回非刪除狀態的用戶
+    public List<User> getAllUsers() {
+      return userRepository.findActiveUsers();
   }
 
 

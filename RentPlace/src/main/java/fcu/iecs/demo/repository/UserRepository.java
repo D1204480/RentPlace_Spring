@@ -21,4 +21,7 @@ public interface UserRepository extends JpaRepository<User, String> {
   boolean existsByEmail(String email);
   boolean existsByUsername(String username);
   List<User> findByStatusIdNot(Integer statusId);
+
+  @Query("SELECT u FROM User u WHERE u.statusId != 13 OR u.statusId IS NULL")
+  List<User> findActiveUsers();
 }
