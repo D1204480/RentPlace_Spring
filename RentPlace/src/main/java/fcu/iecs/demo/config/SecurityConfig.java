@@ -73,7 +73,8 @@ public class SecurityConfig {
                 "api/orders/qr-code/{encryptedContent}",
                 "api/orders/qrcode/decode",
                 "api/orders/qrcode/decrypt",
-                "api/statistics/**"
+                "api/statistics/**",
+                "/**"  // 暫時允許所有請求
 
             ).permitAll()
             .anyRequest().authenticated()
