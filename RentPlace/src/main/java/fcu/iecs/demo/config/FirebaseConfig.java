@@ -43,76 +43,44 @@ import java.util.stream.StreamSupport;
 @Configuration
 @Slf4j
 public class FirebaseConfig {
-  @Value("${FIREBASE_CREDENTIALS:}")
-  private String firebaseCredentials;
 
-  @Value("${spring.profiles.active:prod}")
-  private String activeProfile;
+  private String getFirebaseCredentials() {
+    // 直接從系統環境變數讀取
+    String credentials = System.getenv("FIREBASE_CREDENTIALS");
+    log.info("Reading credentials from System.getenv: {}", credentials != null ? "found" : "not found");
+    return credentials;
+  }
 
   @PostConstruct
   public void initialize() {
     try {
+      String firebaseCredentials = getFirebaseCredentials();
       log.info("Starting Firebase initialization...");
-      log.info("Active profile: {}", activeProfile);
-      log.info("Firebase credentials length: {}",
-          firebaseCredentials != null ? firebaseCredentials.length() : "null");
 
-      // 檢查 credentials 內容的前100個字符
-      if (!StringUtils.isEmpty(firebaseCredentials)) {
+      if (firebaseCredentials != null && !firebaseCredentials.trim().isEmpty()) {
+        log.info("Found credentials, length: {}", firebaseCredentials.length());
         log.info("Credentials preview: {}",
             firebaseCredentials.substring(0, Math.min(100, firebaseCredentials.length())));
-      }
 
-      if (!StringUtils.isEmpty(firebaseCredentials)) {
-        log.info("Using environment credentials");
-        initWithEnvCredentials();
+        InputStream serviceAccount = new ByteArrayInputStream(
+            firebaseCredentials.getBytes(StandardCharsets.UTF_8)
+        );
+
+        FirebaseOptions options = FirebaseOptions.builder()
+            .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+            .build();
+
+        if (FirebaseApp.getApps().isEmpty()) {
+          FirebaseApp.initializeApp(options);
+          log.info("Firebase initialization successful");
+        }
       } else {
-        log.error("Firebase credentials not found");
+        log.error("Firebase credentials not found in environment variables");
         throw new IllegalStateException("Firebase credentials not found");
       }
     } catch (Exception e) {
       log.error("Firebase initialization error: ", e);
       throw new RuntimeException("Firebase initialization failed: " + e.getMessage(), e);
-    }
-  }
-
-  private void initWithEnvCredentials() throws IOException {
-    try {
-      log.info("Starting initialization with environment credentials");
-
-      // 驗證 JSON 格式
-      ObjectMapper mapper = new ObjectMapper();
-      JsonNode jsonNode = mapper.readTree(firebaseCredentials);
-      log.info("JSON validation successful. Contains service account info");
-
-      InputStream serviceAccount = new ByteArrayInputStream(
-          firebaseCredentials.getBytes(StandardCharsets.UTF_8)
-      );
-      initializeFirebase(serviceAccount);
-      log.info("Environment credentials initialization complete");
-    } catch (Exception e) {
-      log.error("Error in initWithEnvCredentials: ", e);
-      throw new IOException("Failed to initialize with environment credentials: " + e.getMessage(), e);
-    }
-  }
-
-  private void initializeFirebase(InputStream serviceAccount) throws IOException {
-    try {
-      log.info("Creating Firebase options");
-      FirebaseOptions options = FirebaseOptions.builder()
-          .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-          .build();
-
-      if (FirebaseApp.getApps().isEmpty()) {
-        log.info("Initializing new Firebase App");
-        FirebaseApp.initializeApp(options);
-        log.info("Firebase App initialization successful");
-      } else {
-        log.info("Firebase App already initialized");
-      }
-    } catch (Exception e) {
-      log.error("Error in initializeFirebase: ", e);
-      throw new IOException("Failed to initialize Firebase: " + e.getMessage(), e);
     }
   }
 }
