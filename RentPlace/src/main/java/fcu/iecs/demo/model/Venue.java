@@ -59,11 +59,11 @@ public class Venue {
     @Column(name = "phone_number")
     private String phoneNumber;
 
-    @OneToMany(mappedBy = "venue")
+    @OneToMany(mappedBy = "venue", fetch = FetchType.EAGER)
     @JsonIgnoreProperties("venue")
     private List<Equipment> equipment;
 
-    @OneToMany(mappedBy = "venue")
+    @OneToMany(mappedBy = "venue", fetch = FetchType.EAGER)
     @JsonIgnoreProperties({"venue"})
     private List<CloseDate> closeDates;
 
