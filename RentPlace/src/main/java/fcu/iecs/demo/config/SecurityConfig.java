@@ -25,6 +25,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 @Configuration
 @EnableWebSecurity  // 啟用 Spring Security
@@ -73,8 +74,7 @@ public class SecurityConfig {
                 "api/orders/qr-code/{encryptedContent}",
                 "api/orders/qrcode/decode",
                 "api/orders/qrcode/decrypt",
-                "api/statistics/**",
-                "/**"  // 暫時允許所有請求
+                "api/statistics/**"
 
             ).permitAll()
             .anyRequest().authenticated()
@@ -95,6 +95,8 @@ public class SecurityConfig {
     configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173", "http://localhost:5174","http://localhost:63342",
         "https://d1204480.github.io", "https://d1204416.github.io", "http://127.0.0.1:5500/"));
 
+//    允許所有來源（測試用）
+     configuration.setAllowedOriginPatterns(Collections.singletonList("*"));
 
     // 允許的 HTTP 方法
     configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
@@ -108,7 +110,9 @@ public class SecurityConfig {
         "Cache-Control",
         "verify-code"
     ));
-    configuration.setAllowCredentials(true);   // 允許攜帶認證訊息
+
+    // 如果使用 setAllowedOriginPatterns("*")，這裡要設為 false
+    configuration.setAllowCredentials(false);   // 允許攜帶認證訊息
     configuration.setMaxAge(3600L);   // 預檢請求的有效期
 
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
