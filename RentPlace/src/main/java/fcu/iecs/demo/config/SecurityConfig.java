@@ -7,6 +7,7 @@ import fcu.iecs.demo.security.JwtTokenProvider;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -14,8 +15,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -77,6 +76,7 @@ public class SecurityConfig {
                 "api/statistics/**"
 
             ).permitAll()
+            .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // 允許所有 OPTIONS 請求
             .anyRequest().authenticated()
         )
         .sessionManagement(session -> session
@@ -90,13 +90,15 @@ public class SecurityConfig {
   @Bean
   public CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration configuration = new CorsConfiguration();
-    // 允許的來源（這裡是本地開發環境）
 
-    configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173", "http://localhost:5174","http://localhost:63342",
+// 方法1：使用具體的允許來源（推薦用於本地開發環境）
+    configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173", "http://localhost:5174", "http://localhost:63342",
         "https://d1204480.github.io", "https://d1204416.github.io", "http://127.0.0.1:5500/"));
+    configuration.setAllowCredentials(true);  // 允許攜帶認證訊息, 當使用具體來源時，可以設為 true
 
-    // 允許所有來源（測試用）
-     configuration.setAllowedOriginPatterns(Collections.singletonList("*"));
+    // 方法2：允許所有來源（僅用於測試）
+//    configuration.setAllowedOriginPatterns(Collections.singletonList("*"));
+//    configuration.setAllowCredentials(false);  // 使用 setAllowedOriginPatterns 時必須設為 false
 
     // 允許的 HTTP 方法
     configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
@@ -111,8 +113,6 @@ public class SecurityConfig {
         "verify-code"
     ));
 
-    // 如果使用 setAllowedOriginPatterns("*")，這裡要設為 false
-    configuration.setAllowCredentials(false);   // 允許攜帶認證訊息
     configuration.setMaxAge(3600L);   // 預檢請求的有效期
 
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
