@@ -94,11 +94,11 @@ public class SecurityConfig {
 // 方法1：使用具體的允許來源（推薦用於本地開發環境）
     configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173", "http://localhost:5174", "http://localhost:63342",
         "https://d1204480.github.io", "https://d1204416.github.io", "http://127.0.0.1:5500/"));
-    configuration.setAllowCredentials(true);  // 允許攜帶認證訊息, 當使用具體來源時，可以設為 true
+//    configuration.setAllowCredentials(true);  // 允許攜帶認證訊息, 當使用具體來源時，可以設為 true
 
     // 方法2：允許所有來源（僅用於測試）
-//    configuration.setAllowedOriginPatterns(Collections.singletonList("*"));
-//    configuration.setAllowCredentials(false);  // 使用 setAllowedOriginPatterns 時必須設為 false
+    configuration.setAllowedOriginPatterns(Collections.singletonList("*"));
+    configuration.setAllowCredentials(false);  // 使用 setAllowedOriginPatterns 時必須設為 false
 
     // 允許的 HTTP 方法
     configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
