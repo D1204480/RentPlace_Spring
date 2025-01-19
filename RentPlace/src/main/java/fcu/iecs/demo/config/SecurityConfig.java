@@ -95,7 +95,7 @@ public class SecurityConfig {
     configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173", "http://localhost:5174","http://localhost:63342",
         "https://d1204480.github.io", "https://d1204416.github.io", "http://127.0.0.1:5500/"));
 
-//    允許所有來源（測試用）
+    // 允許所有來源（測試用）
      configuration.setAllowedOriginPatterns(Collections.singletonList("*"));
 
     // 允許的 HTTP 方法

@@ -7,6 +7,7 @@ import fcu.iecs.demo.repository.EquipmentRepository;
 import fcu.iecs.demo.repository.ImageRepository;
 import fcu.iecs.demo.repository.VenueRepository;
 import jakarta.transaction.Transactional;
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -84,7 +85,10 @@ public class VenueService {
   }
 
   public List<Venue> getAllVenues() {
-    return venueRepository.findAll();
+    List<Venue> venues = venueRepository.findAll();
+    // 確保集合被初始化
+    venues.forEach(venue -> Hibernate.initialize(venue.getEquipment()));
+    return venues;
   }
 
   public Venue getVenueById(Integer id) {
