@@ -53,11 +53,10 @@ public class Reservation {
   @JoinColumn(name = "status_id", referencedColumnName = "status_id", insertable=false, updatable=false)   // 明確指定關聯欄位
   private Status timePeriod_statusInfo;
 
-//  @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-//  @JoinColumn(name = "reservation_id", referencedColumnName = "reservation_id")
-//  private Set<ReservationEquipment> reservationEquipments = new HashSet<>();
-@OneToMany(mappedBy = "reservation", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-private Set<ReservationEquipment> reservationEquipments = new HashSet<>();
+  @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+  @JoinColumn(name = "reservation_id", referencedColumnName = "reservation_id")
+  private Set<ReservationEquipment> reservationEquipments = new HashSet<>();
+
 
 
   // Getters and Setters
@@ -183,10 +182,8 @@ private Set<ReservationEquipment> reservationEquipments = new HashSet<>();
       this.reservationEquipments.clear();
       for (Integer equipmentId : equipmentIds) {
         ReservationEquipment re = new ReservationEquipment();
-        re.setReservation(this);  // 設置預訂關聯
-        Equipment equipment = new Equipment();  // 創建 Equipment 實例
-        equipment.setId(equipmentId);  // 設置設備 ID
-        re.setEquipment(equipment);  // 設置設備關聯
+        re.setReservationId(this.getReservationId());  // 設置預訂ID
+        re.setEquipmentId(equipmentId);
         this.reservationEquipments.add(re);
       }
     }
