@@ -3,7 +3,6 @@ package fcu.iecs.demo.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
-import jakarta.transaction.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -183,13 +182,8 @@ public class Reservation {
       this.reservationEquipments.clear();
       for (Integer equipmentId : equipmentIds) {
         ReservationEquipment re = new ReservationEquipment();
-        re.setReservation(this);  // 設置雙向關係
-
-        // 創建或獲取 Equipment 實體
-        Equipment equipment = new Equipment();
-        equipment.setId(equipmentId);
-        re.setEquipment(equipment);
-
+        re.setReservationId(this.getReservationId());  // 設置預訂ID
+        re.setEquipmentId(equipmentId);
         this.reservationEquipments.add(re);
       }
     }
