@@ -10,11 +10,15 @@ public class ReservationEquipment {
   @Column(name = "reservation_equipment_id")
   private Integer reservationEquipmentId;
 
-  @Column(name = "reservation_id")
-  private Integer reservationId;
+  // 移除原本的 reservationId，改用關聯
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "reservation_id")
+  private Reservation reservation;
 
-  @Column(name = "equipment_id")
-  private Integer equipmentId;
+  // 移除原本的 equipmentId，改用關聯
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "equipment_id")
+  private Equipment equipment;
 
   // getters and setters
 
@@ -26,19 +30,36 @@ public class ReservationEquipment {
     this.reservationEquipmentId = reservationEquipmentId;
   }
 
-  public Integer getReservationId() {
-    return reservationId;
+//  public Integer getReservationId() {
+//    return reservationId;
+//  }
+//
+//  public void setReservationId(Integer reservationId) {
+//    this.reservationId = reservationId;
+//  }
+//
+//  public Integer getEquipmentId() {
+//    return equipmentId;
+//  }
+//
+//  public void setEquipmentId(Integer equipmentId) {
+//    this.equipmentId = equipmentId;
+//  }
+
+
+  public Reservation getReservation() {
+    return reservation;
   }
 
-  public void setReservationId(Integer reservationId) {
-    this.reservationId = reservationId;
+  public void setReservation(Reservation reservation) {
+    this.reservation = reservation;
   }
 
-  public Integer getEquipmentId() {
-    return equipmentId;
+  public Equipment getEquipment() {
+    return equipment;
   }
 
-  public void setEquipmentId(Integer equipmentId) {
-    this.equipmentId = equipmentId;
+  public void setEquipment(Equipment equipment) {
+    this.equipment = equipment;
   }
 }
